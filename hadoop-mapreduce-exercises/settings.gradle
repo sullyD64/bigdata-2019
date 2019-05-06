@@ -1,0 +1,9 @@
+include 'a-wordcount',
+  'b-temperature',
+  'c-bigram',
+  'd-lastfm',
+  'e-cdr',
+  'f-topn',
+  'g-mean'
+
+rootProject.name = 'hadoop-mapreduce-exercises'

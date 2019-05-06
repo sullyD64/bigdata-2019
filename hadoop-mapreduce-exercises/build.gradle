@@ -1,0 +1,45 @@
+allprojects {
+  apply plugin: 'java-library'
+  apply plugin: 'eclipse'
+
+  jar.archiveName = "${project.name}.jar"
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    api 'org.apache.hadoop:hadoop-core:1.2.0'
+    implementation 'log4j:log4j:1.2.16'
+    testImplementation 'junit:junit:4.12'
+  }
+  
+  eclipse.project {
+    natures 'org.eclipse.buildship.core.gradleprojectnature'
+    buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
+  }
+}
+
+subprojects {
+  project.tasks.eclipse.doLast {
+  project.file('.settings/org.eclipse.buildship.core.prefs')
+    .text = """\
+      eclipse.preferences.version=1
+        connection.project.dir=..
+        """
+      .stripIndent()
+  }
+}
+
+
+project.tasks.eclipse.doLast {
+  project.file('.settings/org.eclipse.buildship.core.prefs')
+    .text = """\
+      eclipse.preferences.version=1
+        connection.project.dir=
+        """
+      .stripIndent()
+}
+
+jar.enabled = false
