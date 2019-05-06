@@ -5,12 +5,11 @@ allprojects {
   jar.archiveName = "${project.name}.jar"
 
   repositories {
-    mavenCentral()
     jcenter()
   }
 
   dependencies {
-    api 'org.apache.hadoop:hadoop-core:1.2.0'
+    implementation 'org.apache.hadoop:hadoop-core:1.2.0'
     implementation 'log4j:log4j:1.2.16'
     testImplementation 'junit:junit:4.12'
   }
@@ -18,6 +17,11 @@ allprojects {
   eclipse.project {
     natures 'org.eclipse.buildship.core.gradleprojectnature'
     buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
+  }
+
+  project.tasks.cleanEclipse.doLast {
+    project.delete('bin/')
+    project.delete('.settings/')
   }
 }
 
@@ -41,5 +45,7 @@ project.tasks.eclipse.doLast {
         """
       .stripIndent()
 }
+
+
 
 jar.enabled = false
