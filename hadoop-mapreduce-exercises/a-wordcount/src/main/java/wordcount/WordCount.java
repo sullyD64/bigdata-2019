@@ -20,9 +20,9 @@ public class WordCount {
 		// combiner use
 		job.setCombinerClass(WordCountReducer.class);
 		job.setReducerClass(WordCountReducer.class);
-
-		FileInputFormat.addInputPath(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		
+		FileInputFormat.addInputPath(job, new Path("../input/words2.txt"));
+		FileOutputFormat.setOutputPath(job, new Path("output"));
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
