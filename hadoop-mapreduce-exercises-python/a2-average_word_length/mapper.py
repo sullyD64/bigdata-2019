@@ -15,10 +15,9 @@ def read_input(file):
 
 def main(separator='\t'):
     data = read_input(sys.stdin)
-
     for words in data:
         for word in words:
-            print("%s%s%d" % (word, separator, 1))
+            print("%s%s%d" % (word[0], separator, len(word)))
 
 
 if __name__ == "__main__":
