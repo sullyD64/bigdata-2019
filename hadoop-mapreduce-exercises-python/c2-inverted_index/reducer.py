@@ -1,31 +1,28 @@
+from itertools import groupby
+from operator import itemgetter
 import sys
 
-#TODO
 
-current_bigram = None
-current_count = 0
-bigram = None
+def read_mapper_output(file, separator='\t'):
+    for line in file:
+        yield line.rstrip().split(separator, 1)
 
-for line in sys.stdin:
-    line = line.strip()
 
-    bigram, count = line.split('\t', 1)
+def main(separator='\t'):
+    data = read_mapper_output(sys.stdin, separator=separator)
 
-    # convert count (currently a string) to int
-    try:
-        count = int(count)
-    except ValueError:
-        continue
+    # groupby groups multiple word-count pairs by word,
+    # and creates an iterator that returns consecutive keys and their group:
+    #   current_word - string containing a word (the key)
+    #   group - iterator yielding all ["<current_word>", "<count>"] items
+    for current_word, group in groupby(data, itemgetter(0)):
+        try:
+            iindex = list(int(count) for current_word, count in group)
+            print("%s%s%s" % (current_word, separator, iindex))
+        except ValueError:
+            # count was not a number, so silently discard this item
+            pass
 
-    # this IF-switch only works because Hadoop sorts map output
-    # by key (here: word) before it is passed to the reducer
-    if current_bigram == bigram:
-        current_count += count
-    else:
-        if current_bigram:
-            print('%s\t%s' % (current_bigram, current_count))
-        current_count = count
-        current_bigram = bigram
 
-if current_bigram == bigram:
-    print('%s\t%s' % (current_bigram, current_count))
+if __name__ == "__main__":
+    main()

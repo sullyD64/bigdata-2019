@@ -12,16 +12,18 @@ def clean(word: str):
 
 def read_input(file):
     for line in file:
-        yield clean(line).split()
+        index , strings = line.split('\t')
+        strings = clean(strings).split()
+        yield index , strings
 
 
 def main(separator="\t"):
     data = read_input(sys.stdin)
 
-    for words in data:
-        bigrams = [' '.join(words[i: i + 2]) for i in range(0, len(words) - 1, 1)]
-        for bigram in bigrams:
-            print('%s%s%s' % (bigram, separator, 1))
+    for index , words in data:
+
+        for word in words:
+            print('%s%s%s' % (word, separator, index))
 
 
 if __name__ == '__main__':
