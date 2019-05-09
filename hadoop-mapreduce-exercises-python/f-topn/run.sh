@@ -1,7 +1,7 @@
 #!/bin/bash
 HADOOP_VERSION=3.0.3
 HADOOP_DIR=/home/lorenzo/Software/hadoop-${HADOOP_VERSION}
-INPUT=../input/words.txt
+INPUT=../input/hamlet.txt
 OUTPUT=output/
 
 rm -rf output/

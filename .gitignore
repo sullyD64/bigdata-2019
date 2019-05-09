@@ -2,6 +2,8 @@ dataset/
 output/
 bin
 build
+venv
+.idea
 .gradle
 .settings
 .project

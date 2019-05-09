@@ -15,6 +15,7 @@ def read_input(file):
 
 def main(separator='\t'):
     data = read_input(sys.stdin)
+
     for words in data:
         for word in words:
             print("%s%s%d" % (clean(word), separator, 1))

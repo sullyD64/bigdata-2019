@@ -1,19 +1,25 @@
 import sys
 import re
-# input comes from STDIN (standard input)
-for line in sys.stdin:
-    # remove leading and trailing whitespace
-    line = line.strip()
-    line = re.sub("!|,", "", line)
-    # split the line into words
-    words = line.split()
-    bigrams = [' '.join(words[i: i + 2]) for i in range(0, len(words)-1, 1)]
-    # increase counters
-    for bigram in bigrams:
-        # write the results to STDOUT (standard output);
-        # what we output here will be the input for the
-        # reducer step, i.e. the input for reducer.py
-        #
-        # tab-delimited; the trivial word count is 1
-        print ('%s\t%s' % (bigram, 1))
-        
+
+tokens = re.compile(r'[^0-9a-zA-Z ]+', re.IGNORECASE)
+
+
+def clean(word: str):
+    return re.sub(tokens, '', word.lower())
+
+
+def read_input(file):
+    for line in file:
+        yield line.split()
+
+
+def main(separator="\t"):
+    data = read_input(sys.stdin)
+
+    for words in data:
+        bigrams = [' '.join(words[i: i + 2]) for i in range(0, len(words) - 1, 1)]
+        for bigram in bigrams:
+            print('%s\t%s' % (clean(bigram), 1))
+
+if __name__ == '__main__':
+    main()
