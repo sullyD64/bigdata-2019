@@ -114,7 +114,7 @@ def main(input_file, separator='\t'):
             metrics = StockMetrics()
 
         metrics.update(details)
-
+    # Last line
     metrics.finalize()
     top_stocks.update(current_ticker, metrics) 
     # print(current_ticker, metrics.growth, len(top_stocks.stocks), top_stocks.stocks)

@@ -9,20 +9,12 @@ import sys, re, csv
 # (TICKER, EXCHANGE, NAME, SECTOR, INDUSTRY)
 # 0        1         2     3       4
 
-# input: both files (historical_stocks.csv and historical_stock_prices.csv)
-#        we refer to first file as "legend", and second file as "dataset"
-# output: a triple of tab-delimited values, in which:
-#       - first field always contains TICKER.
-#       - second field contains '0' when reading from legend and '1' when reading from dataset.
-#       - third field contains SECTOR when reading from legend and DETAILS when reading from dataset.
-#          "details" = [OPEN, CLOSE, LOW, HIGH, VOLUME, DATE]
-
 MIN_DATE = "2004-01-01"
 MAX_DATE = "2018-12-31"
 
 def read_input(file):
     for line in file:        
-        yield list(csv.reader([line.strip()], delimiter=',', quotechar='"'))[0]
+        yield list(csv.reader([line.strip()]))[0]
 
 def main():
     infile = sys.stdin
@@ -41,7 +33,7 @@ def main():
       if len(row) == 5: # we are reading from legend
         flag = "0"
         value = row[3]
-      elif len(row) == 8: # we are reading from dataset
+      elif len(row) == 8: # we are reading from history
         flag = "1"
         value = [row[1], row[2], row[4], row[5], row[6], row[7]]
       print('%s\t%s\t%s' % (ticker, flag, value))
