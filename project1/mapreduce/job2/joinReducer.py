@@ -3,12 +3,17 @@ from datetime import datetime
 from statistics import mean
 import sys, os, re, math
 
-# input: (TICKER, OPEN, CLOSE, ADJ_CLOSE, LOW, HIGH, VOLUME, DATE)
-#        0        1     2      3          4    5     6       7
+# historical_stock_prices.csv (8 fields): 
+# (TICKER, OPEN, CLOSE, ADJ_CLOSE, LOW, HIGH, VOLUME, DATE)
+#  0       1     2      3          4    5     6       7
 
-NUM_RANKS = 100
-FIRST_YEAR = 1998
-LAST_YEAR = 2018
+# historical_stocks.csv (5 fields):
+# (TICKER, EXCHANGE, NAME, SECTOR, INDUSTRY)
+# 0        1         2     3       4
+
+# NUM_RANKS = 100
+# FIRST_YEAR = 1998
+# LAST_YEAR = 2018
 
 class StockMetrics:
     def __init__(self):
@@ -126,5 +131,4 @@ def main(input_file, separator='\t'):
 
 
 if __name__ == "__main__":
-    #main(open(os.path.join(sys.path[0], "reducerinput.txt")))
     main (sys.stdin)
