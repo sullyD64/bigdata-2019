@@ -11,6 +11,7 @@ from pathlib import Path
 # PRETTY-PRINT
 # column <filename> -t -s,
 
+# __________________________________________JOB 1 ___________________________________________________________________________
 
 # calculate the following values among all rows with same TICKER between 1998 and 2018:
 # - %INCREASE = difference(avg(CLOSE in 2018), avg(CLOSE in 1998))
@@ -29,6 +30,40 @@ from pathlib import Path
 #       then calculate average values and subtract them
 #     initialize MIN_PRICE with LOW and MAX_PRICE with HIGH
 #     to calculate AVG_VOL, fill an empty list with VOLUMEs and calculate avg
+
+
+# __________________________________________JOB 2 ___________________________________________________________________________
+
+# Primo obiettivo: joinare i due dataset. La chiave in comune è TICKER, quindi scriviamo due mapper 
+# (uno per ciascun dataset) che mappa (ticker, <qualcosa>), e un reducer che prende tutti i ticker
+# e li joina tra loro facendo l'unione insiemistica.
+
+# historical_stocks.csv:
+# (TICKER, EXCHANGE, NAME, SECTOR, INDUSTRY)
+
+# historical_stock_prices.csv: 
+# (TICKER, OPEN, CLOSE, ADJ_CLOSE, LOW, HIGH, VOLUME, DATE)
+#  0       1     2      3          4    5     6       7
+
+# sector1 year1
+# sector1 year2
+# ...
+# sector1 yearN
+# sector2 year1
+# sector2 year2
+# ...
+# sector2 yearN
+# ...
+# sectorN yearN
+
+# for each SECTOR, for each YEAR: TOT_SECTOR_VOLUME, TOT_GROWTH, AVG_DAILY_PRICE
+
+# TOT_SECTOR_VOLUME = sum(VOLUME) of all rows with key (sector, year)
+# TOT_GROWTH = FINAL_PRICE - INITIAL_PRICE *100 / INITIAL_PRICE
+#              FINAL_PRICE = sum(CLOSING_PRICE) of all rows with key (sector, year) HAVING date = last date of year
+#              INITIAL_PRICE = sum(CLOSING_PRICE) of all rows with key (sector, year) HAVING date = first date of year
+# AVG_DAILY_PRICE = mean([sum(CLOSING_PRICE_DAY_1), sum(CLOSING_PRICE_DAY_2), ...])
+
 
 
 INPUTDIR = Path(__file__).parent.parent.parent / "dataset"
