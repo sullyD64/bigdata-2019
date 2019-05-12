@@ -97,6 +97,9 @@ def main(input_file, separator='\t'):
     current_sector = None
     current_year = None
     current_date = None
+    DAILY_PRICES_SUMS = []    
+    CURRENT_DAILY_PRICE = 0
+    DAILY_VOLUMES_SUM = 0
 
     for line in input_file:
         sector, date, details = line.strip().split('\t')
@@ -104,12 +107,29 @@ def main(input_file, separator='\t'):
         year = date.split("-")[0]
 
         if current_date != date:
-          # aggiorno DAILY_PRICES mettendoci una nuova entry col totale accumulato per questa giornata
+          if current_date:
+            DAILY_PRICES_SUMS.append(CURRENT_DAILY_PRICE)
+
+          CURRENT_DAILY_PRICE = 0
+          current_date = date
+
           if current_year != year:
-            # calcolo 
-            # stampo report annuale dove metto anche il nome del settore
+            if current_year:
+              TOTAL_GROWTH = 100*(DAILY_PRICES_SUMS[-1] - DAILY_PRICES_SUMS[0])/DAILY_PRICES_SUMS[0]
+              print(DAILY_PRICES_SUMS[-1]  , DAILY_PRICES_SUMS[0] )
+              print(current_sector , current_year ,DAILY_VOLUMES_SUM, TOTAL_GROWTH , mean(DAILY_PRICES_SUMS))
+              # stampo report annuale dove metto anche il nome del settore
+
+            current_year = year
+            DAILY_PRICES_SUMS = []
+            DAILY_VOLUMES_SUM = 0
+
             if current_sector != sector:  
               # devo cambiare il nome del settore 
+              current_sector = sector
+
+        CURRENT_DAILY_PRICE += float(details[0])
+        DAILY_VOLUMES_SUM += float(details[1])
 
         # if current_sector != sector:
         #     if current_year != year:
