@@ -45,10 +45,27 @@ volume e quotazione di un settore si ottengono sommando i relativi valori di tut
 
 for each SECTOR, for each YEAR: TOT_SECTOR_VOLUME, TOT_GROWTH, AVG_DAILY_PRICE
 TOT_SECTOR_VOLUME = sum(VOLUME) of all rows with key (sector, year)
+AVG_DAILY_PRICE = mean(DAILY_PRICES)
+            DAILY_PRICES = [sum(CLOSING_PRICE_DAY_1), sum(CLOSING_PRICE_DAY_2), ...]
 TOT_GROWTH = FINAL_PRICE - INITIAL_PRICE *100 / INITIAL_PRICE
-             FINAL_PRICE = sum(CLOSING_PRICE) of all rows with key (sector, year) HAVING date = last date of year
-             INITIAL_PRICE = sum(CLOSING_PRICE) of all rows with key (sector, year) HAVING date = first date of year
-AVG_DAILY_PRICE = mean([sum(CLOSING_PRICE_DAY_1), sum(CLOSING_PRICE_DAY_2), ...])
+            INITIAL_PRICE = DAILY_PRICES[0]
+            FINAL_PRICE = DAILY_PRICES[-1]
+
+
+
+SECTOR YEAR  TOT_VOLUME  TOT_GROWTH,   AVG_DAILY_PRICE
+1      2004 ...
+1      2005 ...
+....
+1      2018
+
+[
+  SECTOR 1 [[2004,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME],[2005,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME]...]
+  SECTOR 2 [[2004,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME],[2005,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME]...]
+  ...
+]
+
+
 
 
 Primo obiettivo: join. La chiave in comune è $TICKER. 
@@ -56,18 +73,21 @@ Primo obiettivo: join. La chiave in comune è $TICKER.
 - Il mapper prende in input entrambi i file, e produce in output una tripla (TICKER, FLAG, VALUE).
   $FLAG serve a distinguere se la riga proviene dal primo o dal secondo file (0=legend, 1=history)
   $VALUE conterrà $SECTOR per le righe di legend e $DETAILS per le righe di history.
-  $DETAILS è una lista che contiene nel seguente ordine: [$OPEN, $CLOSE, $LOW, $HIGH, $VOLUME, $DATE]
+  $DETAILS è una lista che contiene nel seguente ordine: [$CLOSING_PRICE, $VOLUME, $DATE]
     N.B.: in questa fase vanno skippate le righe contenenti gli header dei due file, inoltre skippiamo anche le righe di
     history che non ricadono nel periodo temporale 2004-2018.
     
 - Il reducer riceve righe raggruppate per TICKER.
   Per ciascun gruppo, la prima linea ha $FLAG=0. Da questa si estrae $TICKER e $SECTOR e passa alla prossima riga.
-  Dalla seconda linea in poi $FLAG=1. A queste righe aggiunge $SECTOR a $DETAILS in ultima pos e stampa ($TICKER, $DETAILS)
+    N.B.: se la prima riga non ha FLAG=0, assegna "N/A" come settore.
+  Dalla seconda linea in poi $FLAG=1. A queste righe aggiunge $SECTOR a $DETAILS in ultima pos.
+  Il reducer produce in output ($SECTOR # $DATE, $DETAILS). $DATE è il quinto campo di $DETAILS, da cui viene estratto e rimosso.
   
+Secondo obiettivo: calcolare i valori aggregati.
 
+- A questo stadio il mapper effettua una semplice copia dell'input proveniente dal reducer del passo precedente.
 
-
-sector1 year1
+sector1 year1 ticker1 <...>
 sector1 year2
 ...
 sector1 yearN
