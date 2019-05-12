@@ -35,7 +35,7 @@ def main():
         value = row[3]
       elif len(row) == 8: # we are reading from history
         flag = "1"
-        value = [row[1], row[2], row[4], row[5], row[6], row[7]]
+        value = [row[2], row[6], row[7]]
       print('%s\t%s\t%s' % (ticker, flag, value))
 
 if __name__ == "__main__":
