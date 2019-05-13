@@ -8,3 +8,4 @@ venv
 .settings
 .project
 .classpath
+project1/\.vscode/
