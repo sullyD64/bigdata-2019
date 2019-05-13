@@ -5,9 +5,6 @@ import sys, os, re, math
 
 # input: SECTOR DATE [CLOSING_PRICE VOLUME]
 
-FIRST_YEAR = 2004
-LAST_YEAR = 2018
-
 def main(input_file):
     current_sector = None
     current_company = None
@@ -29,7 +26,7 @@ def main(input_file):
         if current_company != company:  
             if current_company:
                 company_closing_prices.append(get_total_year_growth(current_year,FIRST_DAY_OF_YEAR_PRICE,last_price))  
-                print('%s\t%s\t%s' % (current_company, company_closing_prices , sector))
+                print('%s\t%s\t%s' % (company_closing_prices , sector, current_company))
 
             current_company = company
             company_closing_prices = []
@@ -47,7 +44,7 @@ def main(input_file):
     
                     
     company_closing_prices.append(get_total_year_growth(current_year,FIRST_DAY_OF_YEAR_PRICE,last_price))  
-    print('%s\t%s\t%s' % (company, company_closing_prices , sector))
+    print('%s\t%s\t%s' % (company_closing_prices , sector, current_company))
 
 
 if __name__ == "__main__":

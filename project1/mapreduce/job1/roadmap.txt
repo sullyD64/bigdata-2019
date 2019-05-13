@@ -112,10 +112,29 @@ sector2 yearN
 sectorN yearN
 
 
+__________________________________________JOB 3 ___________________________________________________________________________
 
 
+2016:5 APPLE  2016:5 FIAT
+2016:5 APPLE  2016:5 BARILLA
+2016:5 FIAT   2016:5 BARILLA
+
+TICK_A  azienda1
+TICK_A  dati
+...
+TICK_A  ultimi dati
+
+TICK_K  azienda1
+TICK_K  dati
+...
+TICK_K  ultimi dati
 
 
+azienda1 crescita_A
+azienda1 crescita_K
+
+
+[2016:0 , 2017_0] BASIC INDUSTRIES [ azienda1 , azienda2 ...]
 
 INPUTDIR = Path(__file__).parent.parent.parent / "dataset"
 STOCKS = INPUTDIR / "historical_stock_prices.csv"
