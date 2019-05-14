@@ -1,0 +1,154 @@
+COMANDO PER PULIRE L'INPUT DI LEGEND (non utilizzato)
+cat historical_stocks.csv | sed 's:\("\)\([^"]*\)\(,\)\([^"]*\):\2:g' > historical_stocks__cleaned.csv
+
+COMANDO PER ESTRARRE I DATASET DI TEST
+tail -n +2 historical_stock_prices.csv | shuf -n 100 -o stocks_test.csv
+
+PRETTY-PRINT
+column <filename> -t -s,
+
+__________________________________________JOB 1 ___________________________________________________________________________
+
+calculate the following values among all rows with same TICKER between 1998 and 2018:
+- %INCREASE = difference(avg(CLOSE in 2018), avg(CLOSE in 1998))
+- MIN_PRICE = min(LOW)
+- MAX_PRICE = max(HIGH)
+- AVG_VOL = avg(VOLUME)
+
+goal: show the top 10 stocks (identified by TICKER) by their %INCREASE.
+output: (TICKER, (%INCREASE, MIN_PRICE, MAX_PRICE, AVG_VOL))
+
+strategy:
+- map by TICKER but filter out every row out of the date period (ticker, details)
+- reduce in the following way:
+    input comes sorted by TICKER, so all rows with same TICKER are consecutive.
+    to calculate %INCREASE, fill up two lists records_first_year and records_last_year containing CLOSE prices, 
+      then calculate average values and subtract them
+    initialize MIN_PRICE with LOW and MAX_PRICE with HIGH
+    to calculate AVG_VOL, fill an empty list with VOLUMEs and calculate avg
+
+
+__________________________________________JOB 2 ___________________________________________________________________________
+
+
+historical_stocks.csv (legend):
+(TICKER, EXCHANGE, NAME, SECTOR, INDUSTRY)
+
+historical_stock_prices.csv (history): 
+(TICKER, OPEN, CLOSE, ADJ_CLOSE, LOW, HIGH, VOLUME, DATE)
+ 0       1     2      3          4    5     6       7
+
+OBIETTIVO: generare, per ciascun $SECTOR, il trend nel periodo 2004-2018, ovvero un elenco contenente, per ciascun YEAR
+nell'intervallo: il volume complessivo del settore, la percentuale di variazione annuale (differenza percentuale arrotondata
+tra la quotazione di fine anno e quella di inizio anno) e la quotazione giornaliera media.
+volume e quotazione di un settore si ottengono sommando i relativi valori di tutte le azioni del settore.
+
+for each SECTOR, for each YEAR: TOT_SECTOR_VOLUME, TOT_GROWTH, AVG_DAILY_PRICE
+TOT_SECTOR_VOLUME = sum(VOLUME) of all rows with key (sector, year)
+AVG_DAILY_PRICE = mean(DAILY_PRICES)
+            DAILY_PRICES = [sum(CLOSING_PRICE_DAY_1), sum(CLOSING_PRICE_DAY_2), ...]
+TOT_GROWTH = FINAL_PRICE - INITIAL_PRICE *100 / INITIAL_PRICE
+            INITIAL_PRICE = DAILY_PRICES[0]
+            FINAL_PRICE = DAILY_PRICES[-1]
+
+
+
+SECTOR YEAR  TOT_VOLUME  TOT_GROWTH,   AVG_DAILY_PRICE
+1      2004 ...
+1      2005 ...
+....
+1      2018
+
+[
+  SECTOR 1 [[2004,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME],[2005,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME]...]
+  SECTOR 2 [[2004,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME],[2005,TOT_VOLUME,TOT_GROWTH,TOT_SECTOR_VOLUME]...]
+  ...
+]
+
+Primo obiettivo: join. La chiave in comune è $TICKER. 
+
+- Il mapper prende in input entrambi i file, e produce in output una tripla (TICKER, FLAG, VALUE).
+  $FLAG serve a distinguere se la riga proviene dal primo o dal secondo file (0=legend, 1=history)
+  $VALUE conterrà $SECTOR per le righe di legend e $DETAILS per le righe di history.
+  $DETAILS è una lista che contiene nel seguente ordine: [$CLOSING_PRICE, $VOLUME, $DATE]
+    N.B.: in questa fase vanno skippate le righe contenenti gli header dei due file, inoltre skippiamo anche le righe di
+    history che non ricadono nel periodo temporale 2004-2018.
+    
+- Il reducer riceve righe raggruppate per TICKER.
+  Per ciascun gruppo, la prima linea ha $FLAG=0. Da questa si estrae $TICKER e $SECTOR e passa alla prossima riga.
+    N.B.: se la prima riga non ha FLAG=0, assegna "N/A" come settore.
+  Dalla seconda linea in poi $FLAG=1. A queste righe aggiunge $SECTOR a $DETAILS in ultima pos.
+  Il reducer produce in output ($SECTOR, $DATE, $DETAILS). $DATE è il terzo campo di $DETAILS, da cui viene estratto e rimosso.
+  
+
+Secondo obiettivo: calcolare i valori aggregati.
+INPUT: $SECTOR $DATE $DETAILS=[$CLOSING_PRICE, $VOLUME]
+- A questo stadio il mapper effettua una semplice copia dell'input proveniente dal reducer del passo precedente.
+- Il reducer scorre l'input:
+    per ogni settore:
+      per ogni anno:
+        per ogni giorno, individuato da DATE(yyyy-mm-dd):
+          - somma il prezzo di chiusura delle azioni, che memorizza in un contatore locale
+          - somma del volume delle azioni, che aggiunge al totale del volume annuale
+        quando cambia il giorno (DATE):
+          - salva il prezzo cumulativo del giorno memorizzandolo in una lista annuale
+          - reinizializza il contatore locale del prezzo
+      quando cambia l'anno (YEAR):
+      -  calcola il fattore di crescita
+      -  calcola il prezzo medio giornaliero
+      -  stampa le tre metriche aggregate annuali: volume totale, fattore di crescita, prezzo medio giornaliero
+
+  
+
+sector1 year1 ticker1 <...>
+sector1 year2
+...
+sector1 yearN
+sector2 year1
+sector2 year2
+...
+sector2 yearN
+...
+sectorN yearN
+
+
+__________________________________________JOB 3 ___________________________________________________________________________
+
+
+2016:5 APPLE  2016:5 FIAT
+2016:5 APPLE  2016:5 BARILLA
+2016:5 FIAT   2016:5 BARILLA
+
+TICK_A  azienda1
+TICK_A  dati
+...
+TICK_A  ultimi dati
+
+TICK_K  azienda1
+TICK_K  dati
+...
+TICK_K  ultimi dati
+
+
+azienda1 crescita_A
+azienda1 crescita_K
+
+
+[2016:0 , 2017_0] BASIC INDUSTRIES [ azienda1 , azienda2 ...]
+
+INPUTDIR = Path(__file__).parent.parent.parent / "dataset"
+STOCKS = INPUTDIR / "historical_stock_prices.csv"
+LEGEND = INPUTDIR / "historical_stocks.csv"
+
+if __name__ == '__main__':
+    num_records_stocks = 20973890  # records in historical_stock_prices.csv
+    num_records_legend = 6461  # records in historical_stocks.csv
+    sample_size = 200
+
+    skip = sorted(random.sample(range(num_records_stocks-1), num_records_stocks-1 - sample_size))
+    df = pd.read_csv(STOCKS, skiprows=skip)
+
+    p = 0.01
+    df = pd.read_csv(str(STOCKS), header=0, skiprows=lambda i: i > 0 and random() > p)
+
+

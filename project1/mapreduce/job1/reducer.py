@@ -1,14 +1,15 @@
-from operator import itemgetter
 from datetime import datetime
 from statistics import mean
-import sys, os, re, math
+import sys, re
+import math
 
 # input: (TICKER, OPEN, CLOSE, ADJ_CLOSE, LOW, HIGH, VOLUME, DATE)
 #        0        1     2      3          4    5     6       7
 
-NUM_RANKS = 100
+NUM_RANKS = 10
 FIRST_YEAR = 1998
 LAST_YEAR = 2018
+
 
 class StockMetrics:
     def __init__(self):
@@ -30,17 +31,14 @@ class StockMetrics:
         # growth metrics
         date = datetime.strptime(row[5], "%Y-%m-%d")
         closing_price = float(row[1])
-
         if date.year == FIRST_YEAR:
             self.records_first_year.append(closing_price)
         elif date.year == LAST_YEAR:
             self.records_last_year.append(closing_price)
-
         if (date < self.oldest_record[0]) and (date.year > FIRST_YEAR):
             self.oldest_record = (date, closing_price)
         if (date > self.newest_record[0]) and (date.year < LAST_YEAR):
             self.newest_record = (date, closing_price)
-
         # min and max price
         self.min_price = min(self.min_price, float(row[2]))
         self.max_price = max(self.max_price, float(row[3]))
@@ -58,11 +56,10 @@ class StockMetrics:
             final_price = mean(self.records_last_year)
         else:
             final_price = self.newest_record[1]
-
-        self.growth = (final_price - initial_price)*100 / initial_price
-
+        self.growth = math.floor((final_price - initial_price)*100 / initial_price)
         # calculate average transaction volume
         self.avg_volume = mean(self.volumes)
+
 
 class TopStocks:
     def __init__(self):
@@ -80,6 +77,7 @@ class TopStocks:
             self.stocks[-1] = candidate
         self.stocks.sort(key = lambda x:x.growth, reverse=True)
 
+
 class TopStocksEntry:
     def __init__(self, ticker, growth, min_price, max_price, avg_volume):
         self.ticker = ticker
@@ -89,7 +87,8 @@ class TopStocksEntry:
         self.avg_volume = avg_volume
 
     def __str__(self):
-        return self.ticker + '\t' + str([self.growth, self.min_price, self.max_price, self.avg_volume])
+        growth_str = "+" + str(self.growth) + "%" if self.growth > 0 else str(self.growth) + "%"
+        return self.ticker + '\t' + str([growth_str, self.min_price, self.max_price, self.avg_volume])
 
     def __repr__(self):
         return str([self.ticker, self.growth])
@@ -120,11 +119,9 @@ def main(input_file, separator='\t'):
     # print(current_ticker, metrics.growth, len(top_stocks.stocks), top_stocks.stocks)
     # print(current_ticker, metrics.growth, metrics.oldest_record, metrics.newest_record)
     
-    print("# TICKER GROWTH  MIN_PRICE  MAX_PRICE  AVG_VOLUME")
     for i, entry in enumerate(top_stocks.stocks):
-        print(i+1, entry)
+        print('%d\t%s' % (i+1, entry))
 
 
 if __name__ == "__main__":
-    #main(open(os.path.join(sys.path[0], "reducerinput.txt")))
     main (sys.stdin)
