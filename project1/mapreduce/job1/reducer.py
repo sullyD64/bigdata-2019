@@ -87,7 +87,7 @@ class TopStocksEntry:
         self.avg_volume = avg_volume
 
     def __str__(self):
-        growth_str = "+" + str(self.growth) + "%" if self.growth > 0 else str(self.growth) + "%"
+        growth_str = "+" + str(self.growth) + "%" if self.growth >= 0 else str(self.growth) + "%"
         return self.ticker + '\t' + str([growth_str, self.min_price, self.max_price, self.avg_volume])
 
     def __repr__(self):

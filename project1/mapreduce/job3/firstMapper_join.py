@@ -32,7 +32,7 @@ def main():
 
       if len(row) == 5: # we are reading from legend
         flag = "0"
-        value = [row[3] , row[2]]
+        value = [row[2] , row[3]]
       elif len(row) == 8: # we are reading from history
         flag = "1"
         value = [row[2], row[7]]

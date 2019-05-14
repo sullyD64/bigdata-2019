@@ -29,7 +29,7 @@ class YearMetrics:
     # no further actions required for tot_volume
 
   def __str__(self):
-    growth_str = "+" + str(self.growth) + "%" if self.growth > 0 else str(self.growth) + "%"
+    growth_str = "+" + str(self.growth) + "%" if self.growth >= 0 else str(self.growth) + "%"
     return str([self.tot_volume, growth_str, self.avg_daily_price])
 
 

@@ -1,5 +1,6 @@
 from statistics import mean
-import sys, re, math
+import sys, re
+import math
 
 # input: SECTOR DATE [CLOSING_PRICE VOLUME]
 
@@ -23,7 +24,8 @@ class CompanyMetrics:
     # no further actions required for tot_volume
 
   def __str__(self):
-    return str(self.growth)+"%"
+    growth_str = "+" + str(self.growth) + "%" if self.growth >= 0 else str(self.growth) + "%"
+    return growth_str
 
 
 def main(input_file):
@@ -37,7 +39,6 @@ def main(input_file):
     company, date, price , sector = line.strip().split('\t')
     year = date.split("-")[0]
 
-    #print(line)
     if curr_date != date:
       if curr_date:
         curr_metrics.update_sums()
@@ -57,7 +58,7 @@ def main(input_file):
     
     curr_metrics.update(float(price))
 
-  # print last sector annual report
+  # print last company annual report
   curr_metrics.update_sums()
   curr_metrics.finalize()
   print('%s\t%s\t%s\t%s' % (curr_company, curr_year, curr_metrics , sector))
