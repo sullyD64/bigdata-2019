@@ -44,9 +44,6 @@ def main(input_file):
 
     if curr_trend != trend:
       if curr_trend:
-        # CALCOLO PRODOTTO CARTESIANO
-        # STAMPA FILTRATA CON CICLO
-        print("HO FINITO")
         curr_trend_companies.generate_similar_couples()
         pass
       curr_trend = trend
@@ -55,10 +52,8 @@ def main(input_file):
     curr_trend_companies.update(Company(name, sector))
     # print('%s\t%s' % (line.strip() , len(curr_trend_companies.companies)))
 
-  # CALCOLO PRODOTTO CARTESIANO
-  # STAMPA FILTRATA CON CICLO
+  # print last company annual report
   curr_trend_companies.generate_similar_couples()
-  print("HO FINITO")
 
 if __name__ == "__main__":
     main(sys.stdin)

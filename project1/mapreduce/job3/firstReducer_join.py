@@ -17,7 +17,7 @@ def main(input_file):
             sector = sector.replace("'","")
             date = details[1]
             price = details[0]
-            print('%s\t%s\t%s\t%s' % ( name, date, price, sector))
+            print('%s\t%s\t%s\t%s' % (name, date, price, sector))
 
     for line in input_file:
         ticker, flag, value = line.strip().split('\t')

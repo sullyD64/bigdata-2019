@@ -139,7 +139,7 @@ azienda1 crescita_A
 azienda1 crescita_K
 
 
-[2016:0 , 2017_0] BASIC INDUSTRIES [ azienda1 , azienda2 ...]
+[2016:0 , 2017_0] BASIC INDUSTRIES azienda1
 
 
 
