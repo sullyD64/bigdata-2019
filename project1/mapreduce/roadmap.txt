@@ -114,6 +114,11 @@ sectorN yearN
 
 __________________________________________JOB 3 ___________________________________________________________________________
 
+OBIETTIVO: generare coppie di aziende ($NAME) di settori diversi ($SECTOR) che, negli ultimi 3 anni, hanno avuto lo stesso
+trend in termini di variazione annuale, indicando le aziende e il trend comune.
+$azienda1 $azienda2 $trend
+
+
 
 2016:5 APPLE  2016:5 FIAT
 2016:5 APPLE  2016:5 BARILLA
@@ -136,10 +141,19 @@ azienda1 crescita_K
 
 [2016:0 , 2017_0] BASIC INDUSTRIES [ azienda1 , azienda2 ...]
 
+
+
+
+
+
+
+______________________________________________________________________________________________________________________________________________________
+
+
 INPUTDIR = Path(__file__).parent.parent.parent / "dataset"
 STOCKS = INPUTDIR / "historical_stock_prices.csv"
 LEGEND = INPUTDIR / "historical_stocks.csv"
-
+´
 if __name__ == '__main__':
     num_records_stocks = 20973890  # records in historical_stock_prices.csv
     num_records_legend = 6461  # records in historical_stocks.csv

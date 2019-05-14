@@ -3,7 +3,7 @@ import sys, re
 import math
 
 # input: TICKER FLAG VALUE
-# VALUE = [SECTOR, NAME] or [CLOSING_PRICE, DATE]
+# VALUE = [NAME, SECTOR] or [CLOSING_PRICE, DATE]
 
 def main(input_file):
     current_ticker = None

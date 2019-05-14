@@ -27,16 +27,16 @@ def main():
         continue
 
       ticker = row[0]
-      value = ""
+      values = ""
       flag = ""
 
       if len(row) == 5: # we are reading from legend
         flag = "0"
-        value = [row[2] , row[3]]
+        values = [row[2] , row[3]]
       elif len(row) == 8: # we are reading from history
         flag = "1"
-        value = [row[2], row[7]]
-      print('%s\t%s\t%s' % (ticker, flag, value))
+        values = [row[2], row[7]]
+      print('%s\t%s\t%s' % (ticker, flag, values))
 
 if __name__ == "__main__":
     main()
