@@ -41,16 +41,14 @@ def main(input_file):
   for line in input_file:
     trend, name, sector = line.strip().split('\t')
   
-
     if curr_trend != trend:
       if curr_trend:
         curr_trend_companies.generate_similar_couples()
-        pass
       curr_trend = trend
       curr_trend_companies = SimilarTrendingCompanies(curr_trend)
 
     curr_trend_companies.update(Company(name, sector))
-    # print('%s\t%s' % (line.strip() , len(curr_trend_companies.companies)))
+    # print('%s\t%s' % (line.strip() , len(curr_trend_companies.companies)))  # for debug purposes
 
   # print last company annual report
   curr_trend_companies.generate_similar_couples()

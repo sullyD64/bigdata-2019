@@ -21,8 +21,7 @@ class CompanyMetrics:
     first_day_price = self.daily_prices_sums[0]
     last_day_price = self.daily_prices_sums[-1]
     self.growth = math.floor((last_day_price - first_day_price)*100 / first_day_price)
-    # no further actions required for tot_volume
-
+    
   def __str__(self):
     sign = 'p' if self.growth >= 0 else 'n'
     val = abs(self.growth)
