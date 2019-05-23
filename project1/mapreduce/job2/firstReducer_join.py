@@ -1,8 +1,7 @@
 import sys, re
 
 # input: TICKER FLAG VALUE
-# VALUE = SECTOR or [CLOSING_PRICE
-# VOLUME, DATE]
+# VALUE = SECTOR or [CLOSING_PRICE, VOLUME, DATE]
 
 def main(input_file):
     current_ticker = None
