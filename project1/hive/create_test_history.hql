@@ -16,7 +16,7 @@ STORED AS
 LOCATION 'file:////home/lorenzo/git/bigdata-2019/project1/hive/history'
 ;
 
-LOAD DATA LOCAL INPATH '/home/lorenzo/git/bigdata-2019/project1/dataset/historical_stock_prices.csv' 
+LOAD DATA LOCAL INPATH '/home/lorenzo/git/bigdata-2019/project1/testdata/dataset_test_100000.csv' 
 OVERWRITE INTO TABLE `history`;
 
 SELECT * FROM `history` LIMIT 10;
