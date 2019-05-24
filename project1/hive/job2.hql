@@ -25,4 +25,4 @@ FROM (
 
 GROUP BY sector, `year`, `initial_price`, `final_price`
 ORDER BY sector, `year`
--- LIMIT 200
+LIMIT 200
