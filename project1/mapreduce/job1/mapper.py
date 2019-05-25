@@ -4,6 +4,7 @@ from datetime import datetime
 MIN_DATE = "1998-01-01"
 MAX_DATE = "2018-12-31"
 
+
 def read_input(file):
     for line in file:
         yield line.strip().split(',')

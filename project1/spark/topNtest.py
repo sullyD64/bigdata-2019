@@ -9,7 +9,7 @@ def clean(line):
     return line.strip().split(' ')
 
 
-conf = SparkConf().setAppName("wordcount")
+conf = SparkConf().setAppName("topN")
 sc = SparkContext(conf=conf)
 
 contentRDD = sc.textFile("hdfs://localhost:9000/user/bigdata/hamlet.txt")
