@@ -1,6 +1,7 @@
 from datetime import datetime
 from statistics import mean
-import sys, re
+import sys
+import re
 import math
 
 # input: (TICKER, OPEN, CLOSE, ADJ_CLOSE, LOW, HIGH, VOLUME, DATE)
@@ -27,7 +28,7 @@ class StockMetrics:
         self.avg_volume = None
 
     # row = [opening_price, closing_price, min_price, max_price, volume, date]
-    def update(self, row):        
+    def update(self, row):
         # growth metrics
         date = datetime.strptime(row[5], "%Y-%m-%d")
         closing_price = float(row[1])
@@ -51,12 +52,13 @@ class StockMetrics:
             initial_price = mean(self.records_first_year)
         else:
             initial_price = self.oldest_record[1]
-        
+
         if len(self.records_last_year) != 0:
             final_price = mean(self.records_last_year)
         else:
             final_price = self.newest_record[1]
-        self.growth = math.floor((final_price - initial_price)*100 / initial_price)
+        self.growth = math.floor(
+            (final_price - initial_price)*100 / initial_price)
         # calculate average transaction volume
         self.avg_volume = mean(self.volumes)
 
@@ -64,18 +66,19 @@ class StockMetrics:
 class TopStocks:
     def __init__(self):
         self.stocks = []
-    
+
     def update(self, ticker, metrics):
-        candidate = TopStocksEntry(ticker, metrics.growth, metrics.min_price, metrics.max_price, metrics.avg_volume)
+        candidate = TopStocksEntry(
+            ticker, metrics.growth, metrics.min_price, metrics.max_price, metrics.avg_volume)
         length = len(self.stocks)
         if length > 0:
             lowest_stock_growth = self.stocks[-1].growth
-            
+
         if length < NUM_RANKS:
             self.stocks.append(candidate)
         elif (length == NUM_RANKS and metrics.growth > lowest_stock_growth):
             self.stocks[-1] = candidate
-        self.stocks.sort(key = lambda x:x.growth, reverse=True)
+        self.stocks.sort(key=lambda x: x.growth, reverse=True)
 
 
 class TopStocksEntry:
@@ -87,7 +90,8 @@ class TopStocksEntry:
         self.avg_volume = avg_volume
 
     def __str__(self):
-        growth_str = "+" + str(self.growth) + "%" if self.growth >= 0 else str(self.growth) + "%"
+        growth_str = "+" + str(self.growth) + \
+            "%" if self.growth >= 0 else str(self.growth) + "%"
         return self.ticker + '\t' + str([growth_str, self.min_price, self.max_price, self.avg_volume])
 
     def __repr__(self):
@@ -101,7 +105,7 @@ def main(input_file, separator='\t'):
 
     for line in input_file:
         ticker, details = line.strip().split('\t', 1)
-        details = re.sub("[\s\[\]']" ,"", details).split(",")
+        details = re.sub("[\s\[\]']", "", details).split(",")
 
         if current_ticker != ticker:
             if current_ticker:
@@ -115,13 +119,13 @@ def main(input_file, separator='\t'):
         metrics.update(details)
     # Last line
     metrics.finalize()
-    top_stocks.update(current_ticker, metrics) 
+    top_stocks.update(current_ticker, metrics)
     # print(current_ticker, metrics.growth, len(top_stocks.stocks), top_stocks.stocks)
     # print(current_ticker, metrics.growth, metrics.oldest_record, metrics.newest_record)
-    
+
     for i, entry in enumerate(top_stocks.stocks):
         print('%d\t%s' % (i+1, entry))
 
 
 if __name__ == "__main__":
-    main (sys.stdin)
+    main(sys.stdin)
