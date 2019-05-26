@@ -4,27 +4,6 @@ from datetime import datetime
 import csv
 import math
 
-'''
-calculate the following values among all rows with same TICKER between 1998 and 2018:
-- %INCREASE = difference(avg(CLOSE in 2018), avg(CLOSE in 1998))
-- MIN_PRICE = min(LOW)
-- MAX_PRICE = max(HIGH)
-- AVG_VOL = avg(VOLUME)
-
-goal: show the top 10 stocks (identified by TICKER) by their %INCREASE.
-output: (TICKER, (%INCREASE, MIN_PRICE, MAX_PRICE, AVG_VOL))
-
-strategy:
-- map by TICKER but filter out every row out of the date period (ticker, details)
-- reduce in the following way:
-    input comes sorted by TICKER, so all rows with same TICKER are consecutive.
-    to calculate %INCREASE, fill up two lists records_first_year and records_last_year containing CLOSE prices,
-      then calculate average values and subtract them
-    initialize MIN_PRICE with LOW and MAX_PRICE with HIGH
-    to calculate AVG_VOL, fill an empty list with VOLUMEs and calculate avg
-
-'''
-
 HISTORY_PATH = "hdfs://localhost:9000/user/bigdata/dataset_test_100k_header.csv"
 LEGEND_PATH = "hdfs://localhost:9000/user/bigdata/historical_stocks.csv"
 MIN_DATE = datetime.strptime("1998-01-01", "%Y-%m-%d").date()
@@ -87,9 +66,13 @@ def combine_growth_accs(acc_a, acc_b):
 def calculate_growth(acc):
     initial_price, final_price = acc[0][1], acc[1][1]
     growth = math.floor((final_price - initial_price) * 100 / initial_price)
-    # growth_str = "+" + str(growth) + \
-    #     "%" if growth >= 0 else str(growth) + "%"
     return growth
+
+
+def pretty_print(row):
+    growth_str = "+" + str(row.growth) + \
+        "%" if row.growth >= 0 else str(row.growth) + "%"
+    return str([growth_str, row.min_price, row.max_price, row.avg_volume])
 
 
 def run_job(rdd):
@@ -100,13 +83,11 @@ def run_job(rdd):
         .reduceByKey(min) \
         .mapValues(lambda x: round(x, 4)) \
         .cache()
-    # .mapValues(lambda x: Row(min_price=round(x, 4))) \
 
     maxprice_rdd = rdd.map(lambda row: (row[0], row[1].price_high)) \
         .reduceByKey(max) \
         .mapValues(lambda x: round(x, 4)) \
         .cache()
-    # .mapValues(lambda x: Row(max_price=round(x, 4))) \
 
     # initialize accumulator
     # (runningSum, runningCount)
@@ -117,7 +98,6 @@ def run_job(rdd):
                         lambda acc_a, acc_b: (acc_a[0] + acc_b[0], acc_a[1] + acc_b[1])) \
         .mapValues(lambda acc: round(acc[0]/acc[1], 4)) \
         .cache()
-    # .mapValues(lambda acc: Row(avg_volume=(round(acc[0]/acc[1], 4)))) \
 
     # initialize accumulator
     # ((initial_date, initial_price),(final_date, final_price))
@@ -129,7 +109,6 @@ def run_job(rdd):
                         combine_growth_accs) \
         .mapValues(calculate_growth) \
         .cache()
-    # .mapValues(lambda acc: Row(growth=calculate_growth(acc))) \
 
     min_max_rdd = minprice_rdd.join(maxprice_rdd)
     min_max_avgvol_rdd = min_max_rdd.join(avgvol_rdd) \
@@ -143,7 +122,11 @@ def run_job(rdd):
         .cache()
 
     ranked_rdd = metrics_rdd.sortBy(lambda x: x[1].growth, ascending=False) \
+        .mapValues(pretty_print) \
         .take(10)
+
+    for k, v in ranked_rdd:
+        print(k, v)
 
 
 if __name__ == "__main__":
