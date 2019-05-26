@@ -77,6 +77,7 @@ def run_job(history_rdd, legend_rdd):
                                      tot_volume=value[1],
                                      )) \
         .mapValues(pretty_print) \
+        .sortBy(lambda row: row[0]) \
         .collect()
 
     for kv in metrics_rdd:
