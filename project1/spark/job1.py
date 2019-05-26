@@ -13,11 +13,11 @@ MIN_DATE = datetime.strptime("1998-01-01", "%Y-%m-%d").date()
 MAX_DATE = datetime.strptime("2018-12-31", "%Y-%m-%d").date()
 
 
-def prefilter_period(row):
+def filter_period(row):
     return MIN_DATE <= row["date"].date() <= MAX_DATE
 
 
-def prefilter_columns(row):
+def select_columns(row):
     return (row.ticker, Row(price_close=row.close,
                             price_low=row.low,
                             price_high=row.high,
@@ -30,8 +30,8 @@ def pretty_print(row):
 
 
 def run_job(rdd):
-    rdd = rdd.filter(prefilter_period) \
-        .map(prefilter_columns)
+    rdd = rdd.filter(filter_period) \
+        .map(select_columns)
 
     minprice_rdd = rdd.map(lambda row: (row[0], row[1].price_low)) \
         .reduceByKey(min) \
@@ -55,10 +55,10 @@ def run_job(rdd):
 
     # initialize accumulator
     # ((initial_date, initial_price),(final_date, final_price))
-    growth_acc1 = (MAX_DATE, 0)
-    growth_acc2 = (MIN_DATE, 0)
+    growth_acc_initial = (MAX_DATE, 0)
+    growth_acc_final = (MIN_DATE, 0)
     growth_rdd = rdd.map(lambda row: (row[0], (row[1].date_created, row[1].price_close))) \
-        .aggregateByKey((growth_acc1, growth_acc2),
+        .aggregateByKey((growth_acc_initial, growth_acc_final),
                         utils.update_growth_acc,
                         utils.combine_growth_accs) \
         .mapValues(utils.calculate_growth) \
@@ -66,16 +66,16 @@ def run_job(rdd):
 
     min_max_rdd = minprice_rdd.join(maxprice_rdd)
     min_max_avgvol_rdd = min_max_rdd.join(avgvol_rdd) \
-        .mapValues(lambda x: (x[0][0], x[0][1], x[1]))
+        .mapValues(lambda value: (value[0][0], value[0][1], value[1]))
     metrics_rdd = min_max_avgvol_rdd.join(growth_rdd) \
-        .mapValues(lambda x: Row(growth=x[1],
-                                 min_price=x[0][0],
-                                 max_price=x[0][1],
-                                 avg_volume=x[0][2],
+        .mapValues(lambda value: Row(growth=value[1],
+                                 min_price=value[0][0],
+                                 max_price=value[0][1],
+                                 avg_volume=value[0][2],
                                  )) \
         .cache()
 
-    ranked_rdd = metrics_rdd.sortBy(lambda x: x[1].growth, ascending=False) \
+    ranked_rdd = metrics_rdd.sortBy(lambda row: row[1].growth, ascending=False) \
         .mapValues(pretty_print) \
         .take(10)
 
