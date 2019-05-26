@@ -1,12 +1,12 @@
-import math
-from datetime import datetime
-
-from pyspark import Row, SparkConf, SparkContext
+from pyspark import SparkContext, SparkConf, Row
 from pyspark.sql import SparkSession, SQLContext
+from datetime import datetime
+import math
 
 
 def create_session(app_name):
     return SparkSession.builder.master('local[4]').appName(app_name).getOrCreate()
+
 
 def load_data(spark, path, preview=False):
     df = spark.read.format("csv") \
@@ -28,8 +28,8 @@ def compare_dateprices(dp_a, dp_b, initial=True):
         best_dp = dp_a if date_a > date_b else dp_b
     return best_dp
 
-# updates one growth accumulator
 
+# updates one growth accumulator
 def update_growth_acc(acc, row_dp):
     initial_dp, final_dp = acc[0], acc[1]
     new_initial_dp = compare_dateprices(initial_dp, row_dp)
@@ -37,7 +37,6 @@ def update_growth_acc(acc, row_dp):
     return (new_initial_dp, new_final_dp)
 
 # combines two growth accumulators into one with the lowest initial date and highest final date
-
 def combine_growth_accs(acc_a, acc_b):
     initial_dp_a, final_dp_a = acc_a[0], acc_a[1]
     initial_dp_a, final_dp_b = acc_b[0], acc_b[1]
@@ -46,11 +45,13 @@ def combine_growth_accs(acc_a, acc_b):
         final_dp_a, final_dp_b, initial=False)
     return (combined_initial_dp, combined_final_dp)
 
+
 def calculate_growth(acc):
     initial_price, final_price = acc[0][1], acc[1][1]
     growth = math.floor((final_price - initial_price)
                         * 100 / initial_price)
     return growth
+
 
 def prettify_growth(growth):
     growth_str = "+" + str(growth) + \
