@@ -20,8 +20,9 @@ FROM (
         year(h.date_created) as `year`,
         h.date_created, h.price_close, h.volume
       FROM legend l JOIN history h on l.ticker=h.ticker
-      WHERE h.date_created between Date('2004-01-01') and Date('2018-12-31')) src) src2
-) src3
+      WHERE h.date_created between Date('2004-01-01') and Date('2018-12-31')) q1
+    ) q2
+) q3
 
 GROUP BY sector, `year`, `initial_price`, `final_price`
 ORDER BY sector, `year`
