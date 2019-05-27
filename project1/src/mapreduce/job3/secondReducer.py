@@ -6,23 +6,25 @@ import math
 
 class CompanyMetrics:
   def __init__(self):
-    self.daily_prices_sums = []
-    self.daily_price = 0
+    self.daily_price_sum = 0
+    self.initial_price = None
+    self.final_price = None
   
   def update(self, price):
-    self.daily_price += price
+    self.daily_price_sum += price
 
   def update_sums(self):
-    self.daily_prices_sums.append(self.daily_price)
-    # TODO check if we can use only two elements on the list (we only need first and last to calculate growth)
-    self.daily_price = 0
+    if self.initial_price == None:
+        self.initial_price = self.daily_price_sum
+    self.final_price = self.daily_price_sum
+    self.daily_price_sum = 0
   
   def finalize(self):
-    first_day_price = self.daily_prices_sums[0]
-    last_day_price = self.daily_prices_sums[-1]
-    self.growth = math.floor((last_day_price - first_day_price)*100 / first_day_price)
-    
+    self.growth = math.floor((self.final_price - self.initial_price)*100 / self.initial_price)
+
   def __str__(self):
+    # encoding necessary for sorting correctly growth values in next step
+    # p=positive, n=negative
     sign = 'p' if self.growth >= 0 else 'n'
     val = abs(self.growth)
     return str(val) + sign
