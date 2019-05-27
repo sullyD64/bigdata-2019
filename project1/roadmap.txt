@@ -166,3 +166,41 @@ if __name__ == '__main__':
     df = pd.read_csv(str(STOCKS), header=0, skiprows=lambda i: i > 0 and random() > p)
 
 
+______________________________________________________________________________________________________________________________________________________
+
+
+ROADMAP RELAZIONE:
+
+- raccolta delle prime righe in output di ciascun job (basta anche l'esecuzione in locale)
+
+- raccolta delle metriche LOCALI
+    - runnare mapreduce in locale con:
+        dataset completo, metà dataset, (un terzo del dataset oppure dataset completo * 2)
+    - runnare hive in locale con 
+        dataset completo, metà dataset, (un terzo del dataset oppure dataset completo * 2)
+    - runnare spark in locale con 
+        dataset completo, metà dataset, (un terzo del dataset oppure dataset completo * 2)
+
+- raccolta delle metriche LOCALI
+    - runnare mapreduce sul cluster con:
+        dataset completo, metà dataset, (un terzo del dataset oppure dataset completo * 2)
+    - runnare hive sul cluster con 
+        dataset completo, metà dataset, (un terzo del dataset oppure dataset completo * 2)
+    - runnare spark sul cluster con 
+        dataset completo, metà dataset, (un terzo del dataset oppure dataset completo * 2)
+
+- plot dei line chart con questi 6 valori per ciascun job (run in locale e su cluster con input variabile)
+
+- rappresentazione a blocchi dei map-reduce/spark (lucidchart)
+- rappresentazione delle tabelle hive a tutti gli step
+
+- scrittura pseudocodice:
+    - mapreduce (job1, job2, job3) 
+    - spark (job1, job2, job3) 
+
+- descrizione di quello che abbiamo fatto (breve, 10 righe max) e del perchè
+
+- PROBLEMI APERTI:
+    - gestione del calcolo growth mapreduce/job2.
+    - gestione dei valori null nei join legend-history sul secondo e terzo job per hive e spark.
+    - mapreduce arrotondamento dei valori alla quarta cifra.
