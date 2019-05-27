@@ -32,7 +32,7 @@ class StockMetrics:
 
         if self.initial_price == None:
             self.initial_price = price_close
-        
+
         self.final_price = price_close
 
         # min and max price
@@ -45,13 +45,13 @@ class StockMetrics:
         # calculate growth
         self.growth = math.floor(
             (self.final_price - self.initial_price)*100 / self.initial_price)
-        
+
         # round min and max price
         self.min_price = round(self.min_price, 4)
         self.max_price = round(self.max_price, 4)
 
         # calculate average transaction volume
-        self.avg_volume = round(mean(self.volumes),4)
+        self.avg_volume = round(mean(self.volumes), 4)
 
 
 class TopStocks:
