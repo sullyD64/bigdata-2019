@@ -31,7 +31,7 @@ class SimilarTrendingCompanies:
   def generate_similar_couples(self):
     for couple in combinations(self.companies, r=2): 
       if not(couple[0].sector == couple[1].sector):
-        print('%s\t%s\t%s' % (couple[0].name, couple[1].name, self.trend))
+        print('%s\t%s\t%s' % (self.trend, couple[0].name, couple[1].name))
 
 
 def main(input_file):
