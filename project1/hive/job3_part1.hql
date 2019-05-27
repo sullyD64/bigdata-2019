@@ -35,7 +35,7 @@ FROM (
           SELECT 
             l.name, l.sector, 
             year(h.date_created) as `year`,
-            h.date_created, h.price_close, h.volume
+            h.date_created, h.price_close
           FROM legend l JOIN history h on l.ticker=h.ticker
           WHERE h.date_created between Date('2016-01-01') and Date('2018-12-31')
           ) q1
