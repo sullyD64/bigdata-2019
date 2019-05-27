@@ -6,7 +6,7 @@ CREATE EXTERNAL TABLE `company_trends` (
   `trend` array<STRING>,
   `name` STRING,
   `sector` STRING)
-LOCATION 'file:////home/lorenzo/git/bigdata-2019/project1/hive/company_trends'
+LOCATION 'file:////home/lorenzo/git/bigdata-2019/project1/src/hive/company_trends'
 ;
 
 
