@@ -9,3 +9,4 @@ venv
 .project
 .classpath
 project1/\.vscode/
+__pycache__
