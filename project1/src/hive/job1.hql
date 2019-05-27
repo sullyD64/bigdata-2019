@@ -12,7 +12,7 @@ FROM (
 		first_value(`price_close`) over (partition by `ticker` order by `date_created`) as `initial_price`,
 		first_value(`price_close`) over (partition by `ticker` order by `date_created` desc) as `final_price`
 	FROM history h
-	WHERE `date_created` between Date('1998-01-01') and Date('2018-12-31')) src
+	WHERE `date_created` between Date('1998-01-01') and Date('2018-12-31')) q1
 GROUP BY `ticker`, `initial_price`, `final_price`
 SORT BY `growth_percentage` desc
 LIMIT 10
