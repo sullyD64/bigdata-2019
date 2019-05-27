@@ -8,17 +8,15 @@ import math
 #        0        1     2      3          4    5     6       7
 
 NUM_RANKS = 10
-FIRST_YEAR = 1998
-LAST_YEAR = 2018
+MIN_DATE = datetime.strptime("1998-01-01", "%Y-%m-%d").date()
+MAX_DATE = datetime.strptime("2018-12-31", "%Y-%m-%d").date()
 
 
 class StockMetrics:
     def __init__(self):
         # growth metrics
-        self.records_first_year = []
-        self.records_last_year = []
-        self.oldest_record = (datetime.max, None)
-        self.newest_record = (datetime.min, None)
+        self.initial_price = None
+        self.final_price = None
         self.growth = None
         # min and max price
         self.min_price = 99999999
@@ -27,40 +25,33 @@ class StockMetrics:
         self.volumes = []
         self.avg_volume = None
 
-    # row = [opening_price, closing_price, min_price, max_price, volume, date]
-    def update(self, row):
+    # row = [price_close, price_low, price_high, volume]
+    def update(self, date_created, row):
         # growth metrics
-        date = datetime.strptime(row[5], "%Y-%m-%d")
-        closing_price = float(row[1])
-        if date.year == FIRST_YEAR:
-            self.records_first_year.append(closing_price)
-        elif date.year == LAST_YEAR:
-            self.records_last_year.append(closing_price)
-        if (date < self.oldest_record[0]) and (date.year > FIRST_YEAR):
-            self.oldest_record = (date, closing_price)
-        if (date > self.newest_record[0]) and (date.year < LAST_YEAR):
-            self.newest_record = (date, closing_price)
+        price_close = float(row[0])
+
+        if self.initial_price == None:
+            self.initial_price = price_close
+        
+        self.final_price = price_close
+
         # min and max price
-        self.min_price = min(self.min_price, float(row[2]))
-        self.max_price = max(self.max_price, float(row[3]))
+        self.min_price = min(self.min_price, float(row[1]))
+        self.max_price = max(self.max_price, float(row[2]))
         # transaction volume
-        self.volumes.append(float(row[4]))
+        self.volumes.append(float(row[3]))
 
     def finalize(self):
         # calculate growth
-        if len(self.records_first_year) != 0:
-            initial_price = mean(self.records_first_year)
-        else:
-            initial_price = self.oldest_record[1]
-
-        if len(self.records_last_year) != 0:
-            final_price = mean(self.records_last_year)
-        else:
-            final_price = self.newest_record[1]
         self.growth = math.floor(
-            (final_price - initial_price)*100 / initial_price)
+            (self.final_price - self.initial_price)*100 / self.initial_price)
+        
+        # round min and max price
+        self.min_price = round(self.min_price, 4)
+        self.max_price = round(self.max_price, 4)
+
         # calculate average transaction volume
-        self.avg_volume = mean(self.volumes)
+        self.avg_volume = round(mean(self.volumes),4)
 
 
 class TopStocks:
@@ -98,14 +89,15 @@ class TopStocksEntry:
         return str([self.ticker, self.growth])
 
 
-def main(input_file, separator='\t'):
+def main(input_file):
     top_stocks = TopStocks()
     current_ticker = None
     metrics = StockMetrics()
 
     for line in input_file:
-        ticker, details = line.strip().split('\t', 1)
+        ticker, date_created, details = line.strip().split('\t')
         details = re.sub("[\s\[\]']", "", details).split(",")
+        date_created = datetime.strptime(date_created, "%Y-%m-%d").date()
 
         if current_ticker != ticker:
             if current_ticker:
@@ -116,7 +108,7 @@ def main(input_file, separator='\t'):
             current_ticker = ticker
             metrics = StockMetrics()
 
-        metrics.update(details)
+        metrics.update(date_created, details)
     # Last line
     metrics.finalize()
     top_stocks.update(current_ticker, metrics)
