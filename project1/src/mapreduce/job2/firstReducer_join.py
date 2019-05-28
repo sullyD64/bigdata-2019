@@ -7,21 +7,20 @@ import re
 
 def main(input_file):
     current_ticker = None
-    ticker_sector = None
 
     def send_output(ticker, flag, value):
         if (int(flag) == 1):
-            details = re.sub("[\s\[\]']", "", value).split(",")
-            date = details[-1]
-            print('%s\t%s\t%s' % (ticker_sector, date, details[:-1]))
+            value = re.sub("[\s\[\]']", "", value).split(",")
+            date_created = value[-1]
+            print('%s\t%s\t%s' % (sector, date_created, value[:-1]))
 
     for line in input_file:
         ticker, flag, value = line.strip().split('\t')
 
         if current_ticker != ticker:
-            # change ticker
+            # ticker has changed
             current_ticker = ticker
-            ticker_sector = value if int(flag) == 0 else "N/A"
+            sector = value if int(flag) == 0 else "N/A"
 
         send_output(ticker, flag, value)
 
