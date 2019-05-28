@@ -14,3 +14,69 @@ for row in input:
 SORT STEP
 ------
 
+FIRST_REDUCER
+
+
+current_ticker = None
+ticker_sector = None
+
+
+for row in input_file:
+    ticker, flag, value = splitBy(row, '\t')
+
+    if current_ticker != ticker:
+        current_ticker = ticker
+        ticker_sector = value if int(flag)==0 else "N/A"
+
+    print(ticker_sector, row.date, row.details)
+
+
+SECOND MAPPER
+
+for row in inputFile:
+  print(row.strip())
+
+--------
+SORT STEP
+--------
+
+SECOND REDUCER
+
+curr_sector = None
+curr_year = None
+curr_date = None
+
+daily_prices_sums = []
+daily_price = 0
+tot_volume = 0
+
+for row in input_file:
+    sector, date, details = splitBy(row, '\t')
+    year = details.year
+
+    if curr_date != date:
+      if curr_date:
+        daily_prices_sums.append(daily_price)
+        daily_price = 0
+
+      curr_date = date
+
+      if curr_year != year:
+        if curr_year:
+
+            first_day_price = first(daily_prices_sums)
+            last_day_price = last(daily_prices_sums)
+            growth = getGrowth(first_day_price, last_day_price)
+            avg_daily_price = mean(self.daily_prices_sums)
+            print(curr_sector, curr_year, tot_volume, growth, avg_daily_price)
+
+
+        curr_year = year
+        curr_metrics = YearMetrics()
+
+        if curr_sector != sector:
+          curr_sector = sector
+
+
+      daily_price += details.price
+      tot_volume += details.volume
