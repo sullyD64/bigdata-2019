@@ -1,12 +1,11 @@
 map(csvFile):
     for row in csvFile:
         next() # Skip the header (first row)
-        row = splitBy(row, ',')
+        row = row.strip().split(',')
 
         if 1998-01-01 <= row.date <= 2018-12-31:
             print(row.ticker, row.date_created, row.details)
 
-SORT STEP (by ticker then by date)
 
 reduce(mappedInput):
     # Initialize current ticker
@@ -24,18 +23,18 @@ reduce(mappedInput):
 
     # Main loop
     for row in mappedInput:
-        ticker, date_created, details = splitBy(row, '\t')
+        ticker, date_created, details = row.split('\t')
 
         # Ticker has changed
         if current_ticker != ticker:
             if current_ticker != None:
                 # Finalize StockMetrics
-            	growth = calculateGrowth(initial_price, final_price)
+                growth = calculateGrowth(initial_price, final_price)
                 min_price = round(min_price, 4)
                 max_price = round(max_price, 4)
                 avg_vol = round(mean(volumes),4)
 
-            	# Update TopStocks
+                # Update TopStocks
                 candidate = [ticker, growth, min_price, max_price, avg_volume]
                 length = len(top_stocks)
                 if length < 10:
@@ -49,7 +48,7 @@ reduce(mappedInput):
             # Change current ticker
             current_ticker = ticker
 
-            # < Re-initialize StockMetrics >
+            '''Re-initialize StockMetrics'''
 
         # Update StockMetrics
         min_price = details.min_price if details.min_price < min_price
@@ -57,8 +56,8 @@ reduce(mappedInput):
         last_closing_price = details.closing_price
 
     # Handle last line separately
-    # < Finalize StockMetricks >
-    # < Update TopStocks >
+    '''Finalize StockMetricks'''
+    '''Update TopStocks'''
 
     # Print TopStocks
     for i, entry in enumerate(top_stocks):
