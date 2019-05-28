@@ -7,19 +7,18 @@ import re
 
 
 # decodes trend string
-def pretty_format(trend_str):
+def pretty_format(trend_str=None):
     if trend_str:
         trend = re.sub("[\s\[\]']", "", trend_str).split(",")
         out_trend = []
         for year_growth in trend:
             year, growth = year_growth.split(':')
-            sign = growth[-1:]
+            sign = growth[-1]
             if sign == 'p':
                 growth = "+" + growth[:1] + "%"
             elif sign == 'n':
                 growth = "-" + growth[:1] + "%"
             out_trend.append(year + ':' + growth)
-        print(out_trend)
         return out_trend
 
 
@@ -70,8 +69,6 @@ def main(input_file):
             curr_trend_companies = SimilarTrendingCompanies(curr_trend)
 
         curr_trend_companies.update(Company(name, sector))
-        # for debug purposes
-        print('%s\t%s' % (line.strip(), len(curr_trend_companies.companies)))
 
     # print last trend couples
     curr_trend_companies.generate_similar_couples()

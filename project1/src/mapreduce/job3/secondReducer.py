@@ -4,7 +4,7 @@ import math
 
 # input: SECTOR DATE [CLOSING_PRICE VOLUME]
 
-class CompanyMetrics:
+class YearMetrics:
   def __init__(self):
     self.daily_price_sum = 0
     self.initial_price = None
@@ -13,7 +13,7 @@ class CompanyMetrics:
   def update(self, price):
     self.daily_price_sum += price
 
-  def update_sums(self):
+  def update_day(self):
     if self.initial_price == None:
         self.initial_price = self.daily_price_sum
     self.final_price = self.daily_price_sum
@@ -32,36 +32,40 @@ class CompanyMetrics:
 
 def main(input_file):
   curr_company = None
+  curr_sector = None
   curr_year = None
   curr_date = None
 
-  curr_metrics = CompanyMetrics()
+  curr_metrics = YearMetrics()
 
   for line in input_file:
-    company, date, price, sector = line.strip().split('\t')
-    year = date.split("-")[0]
+    company, date_created, price_close, sector = line.strip().split('\t')
+    year = date_created.split("-")[0]
 
-    if curr_date != date:
+    if curr_date != date_created:
       if curr_date:
-        curr_metrics.update_sums()
-      curr_date = date
+        curr_metrics.update_day()
+      curr_date = date_created
 
       if curr_year != year:
         if curr_year:
             curr_metrics.finalize()
             year_growth = str(curr_year) + ":" + str(curr_metrics)
-            print('%s\t%s\t%s' % (curr_company, sector, year_growth))
+            print('%s\t%s\t%s' % (curr_company, curr_sector, year_growth))
 
         curr_year = year
-        curr_metrics = CompanyMetrics()
+        curr_metrics = YearMetrics()
         
     if curr_company != company:
         curr_company = company
+
+    if curr_sector != sector:
+      curr_sector = sector
     
-    curr_metrics.update(float(price))
+    curr_metrics.update(float(price_close))
 
   # print last company annual report
-  curr_metrics.update_sums()
+  curr_metrics.update_day()
   curr_metrics.finalize()
   year_growth = str(curr_year) + ":" + str(curr_metrics)
   print('%s\t%s\t%s' % (curr_company, sector, year_growth))
