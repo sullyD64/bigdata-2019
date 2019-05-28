@@ -2,8 +2,7 @@ from itertools import combinations
 import sys
 import re
 
-# COMPANY SECTOR YEAR:GROWTH
-# 0       1      2
+# TREND, NAME, SECTOR
 
 
 # decodes trend string
