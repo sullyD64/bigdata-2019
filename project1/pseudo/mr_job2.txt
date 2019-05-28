@@ -1,0 +1,16 @@
+FIRST_MAPPER
+
+inpuT = "mixed-dataset.csv"
+
+for row in input:
+	row = split_by_comma(row)
+    if is_in_the_period(row):        
+        if len(row)==5 :
+            print row[0], 0, row[3]
+        if len(row==8):
+            print row[0], 1, [row[2], row[6], row[7]]
+
+------
+SORT STEP
+------
+
