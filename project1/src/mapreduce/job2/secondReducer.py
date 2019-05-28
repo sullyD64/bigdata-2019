@@ -42,14 +42,14 @@ def main(input_file):
     curr_metrics = YearMetrics()
 
     for line in input_file:
-        sector, date, details = line.strip().split('\t')
+        sector, date_created, details = line.strip().split('\t')
         details = re.sub("[\s\[\]']", "", details).split(",")
-        year = date.split("-")[0]
+        year = date_created.split("-")[0]
 
-        if curr_date != date:
+        if curr_date != date_created:
             if curr_date:
                 curr_metrics.update_day()
-            curr_date = date
+            curr_date = date_created
 
             if curr_year != year:
                 if curr_year:
@@ -63,7 +63,7 @@ def main(input_file):
                 if curr_sector != sector:
                     curr_sector = sector
 
-            curr_metrics.update(float(details[0]), int(details[1]))
+        curr_metrics.update(float(details[0]), int(details[1]))
 
     # print last sector annual report
     curr_metrics.update_day()
