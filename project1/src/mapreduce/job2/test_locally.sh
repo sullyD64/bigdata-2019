@@ -5,4 +5,4 @@ then
     exit 1
 fi
 cat "$1" "$2" | python3 firstMapper_join.py | sort | python3 firstReducer_join.py \
-        | column -ts $'\t'
+        | python3 secondMapper_copy.py | sort | python3 secondReducer.py | column -ts $'\t'
