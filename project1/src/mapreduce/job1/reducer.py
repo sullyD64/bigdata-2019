@@ -8,9 +8,6 @@ import math
 #        0        1     2      3          4    5     6       7
 
 NUM_RANKS = 10
-MIN_DATE = datetime.strptime("1998-01-01", "%Y-%m-%d").date()
-MAX_DATE = datetime.strptime("2018-12-31", "%Y-%m-%d").date()
-
 
 class StockMetrics:
     def __init__(self):
@@ -63,11 +60,10 @@ class TopStocks:
             ticker, metrics.growth, metrics.min_price, metrics.max_price, metrics.avg_volume)
         length = len(self.stocks)
         if length > 0:
-            lowest_stock_growth = self.stocks[-1].growth
-
+            worst_growth = self.stocks[-1].growth
         if length < NUM_RANKS:
             self.stocks.append(candidate)
-        elif (length == NUM_RANKS and metrics.growth > lowest_stock_growth):
+        elif (length == NUM_RANKS and metrics.growth > worst_growth):
             self.stocks[-1] = candidate
         self.stocks.sort(key=lambda x: x.growth, reverse=True)
 
@@ -103,17 +99,14 @@ def main(input_file):
             if current_ticker:
                 metrics.finalize()
                 top_stocks.update(current_ticker, metrics)
-                # print(current_ticker, metrics.growth, len(top_stocks.stocks), top_stocks.stocks)
-                # print(current_ticker, metrics.growth, metrics.oldest_record, metrics.newest_record)
             current_ticker = ticker
             metrics = StockMetrics()
 
         metrics.update(date_created, details)
+    
     # Last line
     metrics.finalize()
     top_stocks.update(current_ticker, metrics)
-    # print(current_ticker, metrics.growth, len(top_stocks.stocks), top_stocks.stocks)
-    # print(current_ticker, metrics.growth, metrics.oldest_record, metrics.newest_record)
 
     for i, entry in enumerate(top_stocks.stocks):
         print('%d\t%s' % (i+1, entry))
