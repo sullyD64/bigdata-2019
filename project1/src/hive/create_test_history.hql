@@ -22,7 +22,7 @@ TBLPROPERTIES (
 ;
 
 -- LOAD DATA LOCAL INPATH '/home/lorenzo/git/bigdata-2019/project1/testdata/dataset_test_100k_header.csv' 
-LOAD DATA INPATH '/user/user33/dataset/test/dataset_test_100k_header.csv' 
+LOAD DATA INPATH '/user/user33/testset/dataset_test_100k_header.csv' 
 OVERWRITE INTO TABLE `history`;
 
 SELECT * FROM `history` LIMIT 10;
