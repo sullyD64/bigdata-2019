@@ -1,0 +1,44 @@
+MAPPER
+
+inpuT = "dataset.csv"
+
+for row in input:
+	row = split_by_comma(row)
+    if filter_by_period(row["date"]):
+    	print((row["ticker"], get_details(row))
+
+-
+
+SORT STEP (by ticker then by date)
+
+-
+
+REDUCER
+
+current_ticker = None
+min_price = 999999
+max_price = -999999
+first_closing_price = None
+last_closing_price = None
+growth = None
+
+
+for line in input_file:
+    ticker, details = spli_by_tab(line)
+
+    if current_ticker != ticker:
+        if current_ticker:
+        	growt = get_growth(last_closing_price, first_closing_price)
+        	print(current_ticker, min_price, max_price, growth)
+
+        first_closing_price = detail.closing_price 
+        current_ticker = ticker
+		min_price = 999999
+		max_price = -999999
+		last_closing_price = None
+		growth = None
+
+    min_price = details.min_price if details.min_price < min_price
+    max_price = details.max_price if details.max_price > max_price
+    last_closing_price = details.closing_price
+
