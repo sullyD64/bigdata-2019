@@ -1,44 +1,68 @@
-MAPPER
+map(csvFile):
+    for row in csvFile:
+        next() # Skip the header (first row)
+        row = splitBy(row, ',')
 
-inpuT = "dataset.csv"
-
-for row in input:
-	row = split_by_comma(row)
-    if filter_by_period(row["date"]):
-    	print((row["ticker"], get_details(row))
-
--
+        if 1998-01-01 <= row.date <= 2018-12-31:
+            print(row.ticker, row.date_created, row.details)
 
 SORT STEP (by ticker then by date)
 
--
+reduce(mappedInput):
+    # Initialize current ticker
+    current_ticker = None
 
-REDUCER
+    # Initialize StockMetrics
+    min_price = +inf
+    max_price = -inf
+    initial_price = None
+    final_price = None
+    volumes = []
 
-current_ticker = None
-min_price = 999999
-max_price = -999999
-first_closing_price = None
-last_closing_price = None
-growth = None
+    # Initialize TopStocks
+    top_stocks = []
+
+    # Main loop
+    for row in mappedInput:
+        ticker, date_created, details = splitBy(row, '\t')
+
+        # Ticker has changed
+        if current_ticker != ticker:
+            if current_ticker != None:
+                # Finalize StockMetrics
+            	growth = calculateGrowth(initial_price, final_price)
+                min_price = round(min_price, 4)
+                max_price = round(max_price, 4)
+                avg_vol = round(mean(volumes),4)
+
+            	# Update TopStocks
+                candidate = [ticker, growth, min_price, max_price, avg_volume]
+                length = len(top_stocks)
+                if length < 10:
+                    top_stocks.append(candidate)
+                else if length == 10 and growth > top_stocks[-1].growth:
+                    top_stocks[-1] = candidate
+
+                # Sort TopStocks
+                top_stocks.sort(key=lambda x: x.growth, reverse=True)
+
+            # Change current ticker
+            current_ticker = ticker
+
+            # < Re-initialize StockMetrics >
+
+        # Update StockMetrics
+        min_price = details.min_price if details.min_price < min_price
+        max_price = details.max_price if details.max_price > max_price
+        last_closing_price = details.closing_price
+
+    # Handle last line separately
+    # < Finalize StockMetricks >
+    # < Update TopStocks >
+
+    # Print TopStocks
+    for i, entry in enumerate(top_stocks):
+        print(i+1, entry)
 
 
-for line in input_file:
-    ticker, details = spli_by_tab(line)
-
-    if current_ticker != ticker:
-        if current_ticker:
-        	growt = get_growth(last_closing_price, first_closing_price)
-        	print(current_ticker, min_price, max_price, growth)
-
-        first_closing_price = detail.closing_price 
-        current_ticker = ticker
-		min_price = 999999
-		max_price = -999999
-		last_closing_price = None
-		growth = None
-
-    min_price = details.min_price if details.min_price < min_price
-    max_price = details.max_price if details.max_price > max_price
-    last_closing_price = details.closing_price
 
