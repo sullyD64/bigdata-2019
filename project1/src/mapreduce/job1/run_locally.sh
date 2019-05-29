@@ -4,8 +4,8 @@ hpath=hdfs://localhost:9000/user/user33
 
 local_output=../../../outputs/mr_job1
 
-# input=$hpath/dataset/historical_stock_prices.csv
-input=$hpath/testset/dataset_test_100k_header.csv
+input=$hpath/dataset/historical_stock_prices.csv
+#input=$hpath/testset/dataset_test_100k_header.csv
 
 output=$hpath/out
 

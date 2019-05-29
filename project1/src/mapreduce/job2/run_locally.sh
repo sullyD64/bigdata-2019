@@ -4,8 +4,8 @@ hpath=hdfs://localhost:9000/user/user33
 
 local_output=../../../outputs/mr_job2
 
-input=$hpath/testset/
-# input=$hpath/dataset/
+# input=$hpath/testset/
+input=$hpath/dataset/
 
 tmp1=$hpath/tmp1
 output=$hpath/out

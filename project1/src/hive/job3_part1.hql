@@ -1,18 +1,18 @@
 SET mapreduce.job.reduces = 1;
 
-DROP TABLE IF EXISTS `company_trends`;
+DROP TABLE IF EXISTS `u33_company_trends`;
 
--- CREATE EXTERNAL TABLE `company_trends` (
-CREATE TABLE `company_trends` (
+-- CREATE EXTERNAL TABLE `u33_company_trends` (
+CREATE TABLE `u33_company_trends` (
   `trend` array<STRING>,
   `name` STRING,
   `sector` STRING)
--- LOCATION 'hdfs:////user/user33/hive/company_trends'
--- LOCATION 'file:////home/lorenzo/git/bigdata-2019/project1/src/hive/company_trends'
+-- LOCATION 'hdfs:////user/user33/hive/u33_company_trends'
+-- LOCATION 'file:////home/lorenzo/git/bigdata-2019/project1/src/hive/u33_company_trends'
 ;
 
 
-INSERT OVERWRITE TABLE `company_trends`
+INSERT OVERWRITE TABLE `u33_company_trends`
 SELECT
   collect_set(q5.`year_trend`) as `trend`,
   q5.`name`, q5.`sector`
@@ -36,7 +36,7 @@ FROM (
         FROM (
           SELECT 
             l.`name`, l.`sector`, 
-            year(h.date_created) as `year`,
+            year(h.`date_created`) as `year`,
             h.`date_created`, h.`price_close`
           FROM legend l JOIN history h on l.`ticker`=h.`ticker`
           WHERE h.`date_created` between Date('2016-01-01') and Date('2018-12-31')
@@ -49,4 +49,4 @@ FROM (
 GROUP BY `name`, `sector`
 ORDER BY `trend`;
 
-SELECT * FROM `company_trends` LIMIT 10;
+SELECT * FROM `u33_company_trends` LIMIT 10;

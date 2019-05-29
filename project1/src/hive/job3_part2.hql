@@ -23,7 +23,7 @@ FROM (
           ct1.sector as `sector_A`, 
           ct2.name as `name_B`, 
           ct2.sector as `sector_B`
-        FROM `company_trends` ct1 LEFT JOIN `company_trends` ct2
+        FROM `u33_company_trends` ct1 LEFT JOIN `u33_company_trends` ct2
         ON concat_ws(',', ct1.trend)=concat_ws(',', ct2.trend)
         WHERE ct1.name <> ct2.name 
         AND ct1.sector <> ct2.sector

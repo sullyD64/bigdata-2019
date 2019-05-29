@@ -1,7 +1,6 @@
-DROP TABLE IF EXISTS `legend`;
+DROP TABLE IF EXISTS `u33_legend`;
 
--- CREATE EXTERNAL TABLE `legend` (
-CREATE TABLE `legend` (
+CREATE TABLE `u33_legend` (
   `ticker` STRING,
   `exchange` STRING,
   `name` STRING,
@@ -11,8 +10,8 @@ ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 STORED AS 
   INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat'
   OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
--- LOCATION 'hdfs:////user/user33/hive/legend'
--- LOCATION 'file:////home/lorenzo/git/bigdata-2019/project1/src/hive/legend'
+-- LOCATION 'hdfs:////user/user33/hive/u33_legend'
+-- LOCATION 'file:////home/lorenzo/git/bigdata-2019/project1/src/hive/u33_legend'
 TBLPROPERTIES (
 	'serialization.null.format' = '',
 	'skip.header.line.count' = '1')
@@ -20,6 +19,6 @@ TBLPROPERTIES (
 
 -- LOAD DATA LOCAL INPATH '/home/lorenzo/git/bigdata-2019/project1/testdata/historical_stocks.csv' 
 LOAD DATA INPATH '/user/user33/dataset/historical_stocks.csv' 
-OVERWRITE INTO TABLE `legend`;
+OVERWRITE INTO TABLE `u33_legend`;
 
-SELECT * FROM `legend` LIMIT 10;
+SELECT * FROM `u33_legend` LIMIT 10;
