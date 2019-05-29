@@ -1,4 +1,5 @@
-from statistics import mean
+#!/usr/bin/env python
+import numpy as np
 import sys
 import re
 import math
@@ -25,7 +26,7 @@ class YearMetrics:
         last_day_price = self.daily_prices_sums[-1]
         self.growth = math.floor(
             (last_day_price - first_day_price)*100 / first_day_price)
-        self.avg_daily_price = round(mean(self.daily_prices_sums), 4)
+        self.avg_daily_price = round(np.average(self.daily_prices_sums), 4)
         # no further actions required for tot_volume
 
     def __str__(self):

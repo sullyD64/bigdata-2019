@@ -1,5 +1,7 @@
+#!/usr/bin/env python
 from datetime import datetime
-from statistics import mean
+# from statistics import mean
+import numpy as np 
 import sys
 import re
 import math
@@ -48,7 +50,7 @@ class StockMetrics:
         self.max_price = round(self.max_price, 4)
 
         # calculate average transaction volume
-        self.avg_volume = round(mean(self.volumes), 4)
+        self.avg_volume = round(np.average(self.volumes), 4)
 
 
 class TopStocks:

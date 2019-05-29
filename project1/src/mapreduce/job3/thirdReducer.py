@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from itertools import combinations
 import sys
 import re
