@@ -7,8 +7,9 @@ from pyspark.sql import SparkSession, SQLContext
 
 import utils
 
-HISTORY_PATH = "hdfs://localhost:9000/user/bigdata/dataset_test_100k_header.csv"
-LEGEND_PATH = "hdfs://localhost:9000/user/bigdata/historical_stocks.csv"
+# HISTORY_PATH = "hdfs://localhost:9000/user/user33/testset/dataset_test_100k_header.csv"
+HISTORY_PATH = "hdfs://localhost:9000/user/user33/dataset/historical_stock_prices.csv"
+LEGEND_PATH = "hdfs://localhost:9000/user/user33/dataset/historical_stocks.csv"
 MIN_DATE = datetime.strptime("2004-01-01", "%Y-%m-%d").date()
 MAX_DATE = datetime.strptime("2018-12-31", "%Y-%m-%d").date()
 
