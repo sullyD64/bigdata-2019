@@ -18,7 +18,7 @@ TBLPROPERTIES (
 	'skip.header.line.count' = '1')
 ;
 
-LOAD DATA INPATH '/user/user33/dataset/historical_stock_prices.csv' 
+LOAD DATA INPATH '/user/user33/hiveinput/historical_stock_prices.csv' 
 OVERWRITE INTO TABLE `u33_history`;
 
 SELECT * FROM `u33_history` LIMIT 10;
