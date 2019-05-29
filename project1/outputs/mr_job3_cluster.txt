@@ -1,0 +1,75 @@
+[user33@node1 job3]$ cat 20M_output/part-00000 | column -ts $'\t'
+['2016:+1%', '2017:-1%', '2018:+3%']  COMSTOCK RESOURCES, INC.                     KAYNE ANDERSON ENERGY DEVELOPMENT COMPANY
+['2016:-1%', '2017:+4%', '2018:-1%']  GAP, INC. (THE)                              LAKELAND INDUSTRIES, INC.
+['2016:+1%', '2017:+1%', '2018:+1%']  BLACK KNIGHT, INC.                           POWERSHARES S&P SMALLCAP CONSUMER DISCRETIONARY PORTFOLIO
+['2016:+1%', '2017:+2%', '2018:-9%']  BROOKFIELD RENEWABLE PARTNERS L.P.           INVESCO MORTGAGE CAPITAL INC
+['2016:+1%', '2017:+9%', '2018:-1%']  HERSHEY COMPANY (THE)                        SPECTRUM BRANDS HOLDINGS, INC.
+['2016:-2%', '2017:+7%', '2018:+4%']  COVANTA HOLDING CORPORATION                  UDR, INC.
+['2016:+2%', '2017:+2%', '2018:-4%']  FIRST TRUST RIVERFRONT DYNAMIC EUROPE ETF    FRESENIUS MEDICAL CARE CORPORATION
+['2016:+2%', '2017:-2%', '2018:+1%']  COMMERCE BANCSHARES, INC.                    GORMAN-RUPP COMPANY (THE)
+['2016:+2%', '2017:-2%', '2018:+5%']  AZZ INC.                                     WESTERN GAS PARTNERS, LP
+['2016:+2%', '2017:+1%', '2018:+3%']  EATON CORPORATION, PLC                       POWERSHARES KBW BANK PORTFOLIO
+['2016:+3%', '2017:+2%', '2018:-3%']  NUVEN MORTGAGE OPPORTUNITY TERM FUND 2       PRICESMART, INC.
+['2016:+3%', '2017:+2%']              NVE CORPORATION                              TORCHMARK CORPORATION
+['2016:-3%', '2017:+5%', '2018:+1%']  SYPRIS SOLUTIONS, INC.                       VIRTUS LIFESCI BIOTECH CLINICAL TRIALS ETF
+['2016:+3%', '2017:+1%', '2018:-1%']  CENTERPOINT ENERGY, INC.                     SCORPIO BULKERS INC.
+['2016:+4%', '2017:+9%', '2018:-1%']  NUVEEN DIVERSIFIED DIVIDEND AND INCOME FUND  STANTEC INC
+['2016:+4%', '2017:+1%', '2018:-6%']  KELLY SERVICES, INC.                         MONMOUTH REAL ESTATE INVESTMENT CORPORATION
+['2016:+6%', '2017:+1%', '2018:-3%']  AMERICA FIRST MULTIFAMILY INVESTORS, L.P.    FLEXSHARES REAL ASSETS ALLOCATION INDEX FUND
+['2016:+7%', '2017:+1%', '2018:+3%']  ENTERGY CORPORATION                          OIL-DRI CORPORATION OF AMERICA
+['2016:+8%', '2017:+5%', '2018:+1%']  SEMPRA ENERGY                                STORE CAPITAL CORPORATION
+['2017:+0%', '2018:+1%']              HIGHLAND FLOATING RATE OPPORTUNITIES FUND    HUNTER MARITIME ACQUISITION CORP.
+['2017:+1%', '2018:+1%']              ACTIVE ALTS CONTRARIAN ETF                   AVISTA HEALTHCARE PUBLIC ACQUISITION CORP.
+['2017:+1%', '2018:+1%']              AVISTA HEALTHCARE PUBLIC ACQUISITION CORP.   PRINCIPAL CONTRARIAN VALUE INDEX ETF
+['2017:-4%', '2018:+1%']              PARK HOTELS & RESORTS INC.                   RHYTHM PHARMACEUTICALS, INC.
+['2018:-1%']                          ATTIS INDUSTRIES INC.                        BILIBILI INC.
+['2018:-1%']                          ATTIS INDUSTRIES INC.                        FC GLOBAL REALTY INCORPORATED
+['2018:-1%']                          BILIBILI INC.                                FC GLOBAL REALTY INCORPORATED
+['2018:+1%']                          CONVERGEONE HOLDINGS, INC.                   PATRIOT TRANSPORTATION HOLDING, INC.
+['2018:-2%']                          CARDLYTICS, INC.                             FLAHERTY & CRUMRINE PREFERRED INCOME OPPORTUNITY FUND INC
+['2018:+3%']                          XSPAND PRODUCTS LAB, INC.                    ZSCALER, INC.
+['2018:-3%']                          HOMOLOGY MEDICINES, INC.                     JERASH HOLDINGS (US), INC.
+['2018:-3%']                          BRIGHTSPHERE INVESTMENT GROUP PLC            KEY TRONIC CORPORATION
+['2018:-3%']                          KEY TRONIC CORPORATION                       NEBULA ACQUISITION CORPORATION
+['2018:+4%']                          CONSTRUCTION PARTNERS, INC.                  OP BANCORP
+['2018:+4%']                          ARGO GROUP INTERNATIONAL HOLDINGS, LTD.      COLONY NORTHSTAR CREDIT REAL ESTATE, INC.
+['2018:-5%']                          FARMMI, INC.                                 MTECH ACQUISITION CORP.
+['2018:-5%']                          FARMMI, INC.                                 NINE ENERGY SERVICE, INC.
+['2018:-5%']                          MTECH ACQUISITION CORP.                      NINE ENERGY SERVICE, INC.
+['2018:-5%']                          CHINA NEW BORUN CORPORATION                  GRAFTECH INTERNATIONAL LTD.
+['2018:-6%']                          FIRST CHOICE BANCORP                         MENLO THERAPEUTICS INC.
+['2018:-6%']                          FIRST CHOICE BANCORP                         NATIONAL RESEARCH CORPORATION
+['2018:-6%']                          MUDRICK CAPITAL ACQUISITION CORPORATION      PACER MILITARY TIMES BEST EMPLOYERS ETF
+['2018:-6%']                          ONE MADISON CORPORATION                      PACER MILITARY TIMES BEST EMPLOYERS ETF
+['2018:-7%']                          INSPIRE MEDICAL SYSTEMS, INC.                QUINTANA ENERGY SERVICES INC.
+['2018:-7%']                          BIOXCEL THERAPEUTICS, INC.                   FTS INTERNATIONAL, INC.
+['2018:-8%']                          DFB HEALTHCARE ACQUISITIONS CORP.            LOOP INDUSTRIES, INC.
+['2018:-8%']                          DFB HEALTHCARE ACQUISITIONS CORP.            ONESMART INTERNATIONAL EDUCATION GROUP LIMITED
+['2018:-8%']                          LOOP INDUSTRIES, INC.                        ONESMART INTERNATIONAL EDUCATION GROUP LIMITED
+['2018:-8%']                          CM FINANCE INC                               LEVEL ONE BANCORP, INC.
+['2018:-8%']                          CM FINANCE INC                               SOL-GEL TECHNOLOGIES LTD.
+['2018:-8%']                          LEVEL ONE BANCORP, INC.                      SOL-GEL TECHNOLOGIES LTD.
+['2018:-8%']                          ATLANTICUS HOLDINGS CORPORATION              CENTRAL PUERTO S.A.
+['2018:-8%']                          CENTRAL PUERTO S.A.                          REGALWOOD GLOBAL ENERGY LTD.
+['2018:-8%']                          OXFORD SQUARE CAPITAL CORP.                  PURE ACQUISITION CORP.
+['2018:-8%']                          OXFORD SQUARE CAPITAL CORP.                  SENMIAO TECHNOLOGY LIMITED
+['2018:-9%']                          COLLPLANT HOLDINGS, LTD.                     COMMUNICATIONS SYSTEMS, INC.
+['2018:-9%']                          COLLPLANT HOLDINGS, LTD.                     LIBERTY OILFIELD SERVICES INC.
+['2018:-9%']                          COMMUNICATIONS SYSTEMS, INC.                 LIBERTY OILFIELD SERVICES INC.
+['2018:-9%']                          COMMUNICATIONS SYSTEMS, INC.                 SENSUS HEALTHCARE, INC.
+['2018:-9%']                          LIBERTY OILFIELD SERVICES INC.               SENSUS HEALTHCARE, INC.
+['2018:-9%']                          CIM COMMERCIAL TRUST CORPORATION             GENPREX, INC.
+['2018:-9%']                          CIM COMMERCIAL TRUST CORPORATION             MOGO FINANCE TECHNOLOGY INC.
+['2018:-9%']                          CIM COMMERCIAL TRUST CORPORATION             TORM PLC
+['2018:-9%']                          GENPREX, INC.                                MOGO FINANCE TECHNOLOGY INC.
+['2018:-9%']                          GENPREX, INC.                                TORM PLC
+['2018:-9%']                          MOGO FINANCE TECHNOLOGY INC.                 TORM PLC
+['2018:-9%']                          THE VIVALDI OPPORTUNITIES FUND               TIBERIUS ACQUISITION CORPORATION
+['2018:-9%']                          FLUENT, INC.                                 MOTUS GI HOLDINGS, INC.
+['2018:-9%']                          FLUENT, INC.                                 NAVIOS MARITIME ACQUISITION CORPORATION
+['2018:-9%']                          FLUENT, INC.                                 SOCIAL CAPITAL HEDOSOPHIA HOLDINGS CORP.
+['2018:-9%']                          MOTUS GI HOLDINGS, INC.                      NAVIOS MARITIME ACQUISITION CORPORATION
+['2018:-9%']                          MOTUS GI HOLDINGS, INC.                      SOCIAL CAPITAL HEDOSOPHIA HOLDINGS CORP.
+['2018:-9%']                          NAVIOS MARITIME ACQUISITION CORPORATION      SOCIAL CAPITAL HEDOSOPHIA HOLDINGS CORP.
+['2018:-9%']                          CBX (LISTING MARKET NYSE NETWORKS AE         IPIC ENTERTAINMENT INC.
+['2018:-9%']                          LINK MOTION INC.                             SSLJ.COM LIMITED
