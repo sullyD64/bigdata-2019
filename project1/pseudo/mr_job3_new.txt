@@ -1,0 +1,165 @@
+map_join(csvFiles):
+    for row in csvFiles:
+        row = row.strip().split(',')
+        
+        # Skip headers
+        if "ticker" in row.ticker:
+            continue
+
+        # Rows from legend have 5 fields, rows from history have 8
+        if len(row) == 8 and (row.date < "2004-01-01" or row.date > "2018-12-31"):
+            continue
+     
+        if len(row) == 5 :
+            print(row.ticker, 0, row.sector)
+        if len(row == 8):
+            print(row.ticker, 1, [row.price_close, row.date])
+
+
+reduce_join(mappedInput):
+    # Initialize current ticker
+    current_ticker = None
+
+    for row in mappedInput:
+        ticker, flag, value = row.split('\t')
+
+        # Ticker has changed
+        if current_ticker != ticker:
+            current_ticker = ticker
+            company_info = value if flag==0 else "['N/A', 'N/A']" # Handle null values
+
+        # Extract values and send output
+        if flag==1:
+            print(company_info.name, value.date_created,value.price_close, company_info.sector)
+
+    # Handle last line separately
+    print(company_info.name, value.date_created,value.price_close, company_info.sector)
+
+
+map_copy(reducedInput):
+    for row in reducedInput:
+        print(row.strip())
+
+
+reduce_growth(mappedInput):
+    # Initialize current company, sector, year and day (identified by date)
+    curr_name = None
+    curr_sector = None
+    curr_year = None
+    curr_date = None
+
+    # Initialize YearMetrics (for calculating growth)
+    daily_price_sum = 0
+    initial_price = None
+    final_price = None
+
+    # Main loop
+    for line in mappedInput:
+        company, date_created, price_close, sector = line.strip().split('\t')
+        year = getYear(date_created)
+
+        # Day has changed
+        if curr_date != date_created:
+            if curr_date:
+                # Update YearMetrics at end of day
+                if initial_price == None:
+                    # Memorize the first price of the year (only once)
+                    initial_price = daily_price_sum
+                # Save the current price as final price (every day)
+                final_price = daily_price_sum
+                daily_price_sum = 0
+
+            # Change current day
+            curr_date = date_created
+
+            #Year has changed
+            if curr_year != year:
+                if curr_year:
+                    # Finalize YearMetrics (calculate only growth)
+                    growth = calculateGrowth(final_price, initial_price)
+
+                    # Print year:growth
+                    year_growth = curr_year + ":" + growth
+                    print(curr_name, curr_sector, year_growth)
+
+                # Change current year
+                curr_year = year
+
+                '''Re-initialize YearMetrics'''
+
+        # Company name has changed
+        if curr_name != company:
+            curr_name = company
+
+        # Sector has changed    
+        if curr_sector != sector:
+            curr_sector = sector
+
+        # Update YearMetrics for each entry in day
+        daily_price_sum += price_close
+
+    # Handle last line separately
+    '''Finalize YearMetrics'''
+    '''Print year:growth'''
+
+
+map_trends(reducedInput):
+    # Initialize current Company (name, sector, trend)
+    curr_name = None
+    curr_sector = None
+    curr_trend = []
+
+    for row in reducedInput:
+        # Get next Company
+        next_name, next_sector = row.name, row.sector
+        next_trend = []
+       
+        # Company hasn't changed
+        if curr_name == next_name and curr_sector == next_sector:
+            # Build the trend
+            curr_trend.append(row.year_growth)
+        # Company has changed
+        else:
+            if curr_name:
+                # Print trend, name and sector
+                print(curr_trend, curr_name, curr_sector)
+            
+            # Change current company and start building its trend
+            next_trend.append(row.year_growth)
+            curr_name = next_name
+            curr_sector = next_sector
+            curr_trend = next_trend
+
+    # Handle last line separately
+    print(trend, name, sector)
+
+
+reduce_combinations(mappedInput):
+    # Initialize current SimilarTrendingCompanies  
+    curr_trend = None
+    curr_trend_companies = []
+
+    for line in input_file:
+        trend, name, sector = line.strip().split('\t')
+
+        # Trend has changed
+        if curr_trend != trend:
+            if curr_trend:
+
+                # Generate all couples of two companies from SimilarTrendingCompanies
+                for couple in combinations(curr_trend_companies,r=2):
+                    # Pick only couples from different sectors
+                    if not couple[0].sector == couple[1].sector:
+                        # Print common trend and couple names
+                        print(curr_trend, couple[0].name, couple[1].name)
+
+            # Change current trend and Re-initialize SimilarTrendingCompanies
+            curr_trend = trend
+            curr_trend_companies = []
+
+        # Update SimilarTrendingCompanies
+        curr_trend_companies.append(name)
+
+    # Handle last trend separately
+    '''Generate all all couples of two companies from SimilarTrendingCompanies'''
+    '''Print only couples from different sectors'''
