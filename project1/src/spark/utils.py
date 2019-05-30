@@ -5,7 +5,8 @@ import math
 
 
 def create_session(app_name):
-    return SparkSession.builder.master('local[4]').appName(app_name).getOrCreate()
+    return SparkSession.builder.master('yarn').appName(app_name).getOrCreate()
+    # return SparkSession.builder.master('local[8]').appName(app_name).getOrCreate()
 
 
 def load_data(spark, path, preview=False):
