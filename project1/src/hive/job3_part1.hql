@@ -38,7 +38,7 @@ FROM (
             l.`name`, l.`sector`, 
             year(h.`date_created`) as `year`,
             h.`date_created`, h.`price_close`
-          FROM legend l JOIN history h on l.`ticker`=h.`ticker`
+          FROM u33_legend l JOIN u33_history h on l.`ticker`=h.`ticker`
           WHERE h.`date_created` between Date('2016-01-01') and Date('2018-12-31')
           ) q1
         ) q2
@@ -49,4 +49,4 @@ FROM (
 GROUP BY `name`, `sector`
 ORDER BY `trend`;
 
-SELECT * FROM `u33_company_trends` LIMIT 10;
+SELECT * FROM `u33_company_trends`; --LIMIT 10;
