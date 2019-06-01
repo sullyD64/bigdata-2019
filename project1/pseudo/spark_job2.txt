@@ -1,0 +1,79 @@
+def filter_period(row):
+    return "2004-01-01" <= row.date <= "2018-12-31"
+
+def select_columns_history(row):
+    return (row.ticker, 
+            Row(price_close=row.close,
+                volume=row.volume,
+                date_created=row.date))
+
+def select_columns_legend(row):
+    return (row.ticker, 
+            Row(sector=row.sector))
+
+def run_job(history_rdd, legend_rddw):
+    # Prefilter and field extraction
+    rdd = rdd.filter(filter_period) \
+        .map(select_columns)
+
+
+def run_job(history_rdd, legend_rdd):
+    # Prefilter and field extraction
+    history_rdd = history_rdd.filter(filter_period) \
+        .map(select_columns_history)
+
+    legend_rdd = legend_rdd.map(select_columns_legend)
+
+    ''' Join '''
+
+    sectoryear_rdd = legend_rdd.join(history_rdd) \
+        .map(lambda row: ((row[1][0].sector, row[1][1].date_created.year), row[1][1]))
+
+    ''' Divide et impera '''
+
+    # Calculate tot_volume
+    totvolume_rdd = sectoryear_rdd.map(lambda row: (row[0], row[1].volume)) \
+        .reduceByKey(lambda x, y: x + y) \
+        .cache()
+
+    # Calculate dailypricesum (for splitting again)
+    dailypricessum_rdd = sectoryear_rdd \
+        .map(lambda row: ((row[0][0], row[0][1], row[1].date_created), row[1].price_close)) \
+        .reduceByKey(lambda x, y: x + y)
+
+    ''' Divide et impera '''
+
+    # Calculate avg_daily_price
+    # initialize accumulator (runningSum, runningCount)
+    avgdailyprice_acc = (0, 0)
+    avgdailyprice_rdd = dailypricessum_rdd.map(lambda row: ((row[0][0], row[0][1]), row[1])) \
+        .aggregateByKey(avgdailyprice_acc,
+                        lambda acc, x: (acc[0] + x, acc[1] + 1),
+                        lambda acc_a, acc_b: (acc_a[0] + acc_b[0], acc_a[1] + acc_b[1])) \
+        .mapValues(lambda acc: round(acc[0]/acc[1], 4)) \
+        .cache()
+
+
+    # Calculate growth
+    # initialize accumulator ((initial_date, initial_price),(final_date, final_price))
+    growth_acc_initial = (MAX_DATE, 0)
+    growth_acc_final = (MIN_DATE, 0)
+    growth_rdd = dailypricessum_rdd.map(lambda row: ((row[0][0], row[0][1]), (row[0][2], row[1]))) \
+        .aggregateByKey((growth_acc_initial, growth_acc_final),
+                        utils.update_growth_acc,
+                        utils.combine_growth_accs) \
+        .mapValues(utils.calculate_growth) \
+        .cache()
+
+
+    ''' Join '''
+
+    avgdailyprice_growth_rdd = avgdailyprice_rdd.join(growth_rdd)
+    metrics_rdd = avgdailyprice_growth_rdd.join(totvolume_rdd) \
+        .mapValues(lambda value: Row(growth=value[0][1],    # Flatten
+                                     avg_daily_price=value[0][0],
+                                     tot_volume=value[1],
+                                     )) \
+        .mapValues(pretty_print) \
+        .sortBy(lambda row: row[0]) \
+        .collect()

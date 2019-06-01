@@ -1,0 +1,39 @@
+
+# Support methods for AggregateByKey for calculating growth
+# dp stands for date_price, aka (date_created, price), where price might be:
+#   - price_close (Job 1)
+#   - dailypricesum (Job 2 & 3)
+
+# Compares two dates and returns the date-price pair associated to the date with the best value
+# (default criterium is: earlier date wins, set initial=false to pick later date)
+def compare_dateprices(dp_a, dp_b, initial=True):
+    date_a, date_b = dp_a.date, dp_b.date
+    if initial:
+        best_dp = dp_a if date_a <= date_b else dp_b
+    else:
+        best_dp = dp_a if date_a > date_b else dp_b
+    return best_dp
+
+
+# Updates one growth accumulator
+def update_growth_acc(acc, row_dp):
+    initial_dp, final_dp = acc[0], acc[1]
+    new_initial_dp = compare_dateprices(initial_dp, row_dp)
+    new_final_dp = compare_dateprices(initial_dp, row_dp, initial=False)
+    return (new_initial_dp, new_final_dp)
+
+# Combines two growth accumulators into one with the lowest initial date and highest final date
+def combine_growth_accs(acc_a, acc_b):
+    initial_dp_a, final_dp_a = acc_a[0], acc_a[1]
+    initial_dp_a, final_dp_b = acc_b[0], acc_b[1]
+    combined_initial_dp = compare_dateprices(initial_dp_a, initial_dp_a)
+    combined_final_dp = compare_dateprices(
+        final_dp_a, final_dp_b, initial=False)
+    return (combined_initial_dp, combined_final_dp)
+
+# Calculates the growth given an accumulator
+def calculate_growth(acc):
+    initial_price, final_price = acc.initial_price, acc.final_price
+    growth = math.floor((final_price - initial_price)
+                        * 100 / initial_price)
+    return growth

@@ -1,0 +1,63 @@
+def filter_period(row):
+    return "2016-01-01" <= row.date <= "2018-12-31"
+
+def select_columns_history(row):
+    return (row.ticker, 
+            Row(price_close=row.close,
+                date_created=row.date))
+
+def select_columns_legend(row):
+    return (row.ticker, 
+            Row(name=row.name,
+                sector=row.sector))
+
+def run_job(history_rdd, legend_rdd):
+    # Prefilter and field extraction
+    history_rdd = history_rdd.filter(filter_period) \
+        .map(select_columns_history)
+
+    legend_rdd = legend_rdd.map(select_columns_legend)
+
+    ''' Join '''
+
+    # Here we operate sequentially on the same rdd. 
+    # We calculate dailypricesum first, then calculate growth
+
+    # Initialize accumulator((initial_date, initial_price),(final_date, final_price))
+    growth_acc_initial = (MAX_DATE, 0)
+    growth_acc_final = (MIN_DATE, 0)
+    yeargrowth_rdd = legend_rdd.join(history_rdd) \
+        .map(lambda row: ((row[1][0].name, row[1][0].sector, row[1][1].date_created.year, row[1][1].date_created),
+                          row[1][1].price_close)) \
+        .reduceByKey(lambda x, y: x + y) \
+        .map(lambda row: ((row[0][0], row[0][1], row[0][2]),
+                          (row[0][3], row[1]))) \
+        .aggregateByKey((growth_acc_initial, growth_acc_final),
+                        utils.update_growth_acc,
+                        utils.combine_growth_accs) \
+        .mapValues(utils.calculate_growth) \
+        .sortBy(lambda row: row[0]) \
+        .cache()
+
+
+    # Calculate trend by mapping year:growth couples and then grouping by key
+    trend_rdd = yeargrowth_rdd \
+        .map(lambda row: ((row[0][0], row[0][1]),
+                          str(row[0][2]) + ":" + row[1])) \
+        .groupByKey() \
+        .map(lambda row: (row[1], (row[0]))) \
+        .cache()
+
+
+    ''' Combinations '''
+
+    # Returns true when company_a and company_b are equal, or when their sectors are equal 
+    def filter_couples(row):
+        company_a, company_b = row[1][0], row[1][1]
+        a_name, a_sector = company_a[0], company_a[1]
+        b_name, b_sector = company_b[0], company_b[1]
+        return ((a_name != b_name) and (a_sector != b_sector))
+
+    similartrendingcompanies_rdd = trend_rdd.join(trend_rdd) \
+        .filter(filter_couples) \
+        .collect()

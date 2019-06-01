@@ -76,9 +76,9 @@ def run_job(history_rdd, legend_rdd):
         .map(lambda row: ((row[0][0], row[0][1]),
                           str(row[0][2]) + ":" + utils.prettify_growth(row[1]))) \
         .groupByKey() \
-        .mapValues(iterate) \
         .map(lambda row: (row[1], (row[0]))) \
         .cache()
+        # .mapValues(iterate) \
     # .mapValues(iterate) put it after groupByKey to see content of trend
 
     similartrendingcompanies_rdd = trend_rdd.join(trend_rdd) \
