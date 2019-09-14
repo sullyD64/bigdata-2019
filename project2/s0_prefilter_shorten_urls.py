@@ -27,8 +27,8 @@ SKIP_PATTERNS = "@(?!en)|"\
 
 def run_job(rdd):
     rdd = rdd \
-        .filter(lambda x: not re.findall(SKIP_PATTERNS, x) \
-        .map(lambda x: x.replace(FB_PREDIX, NEW_PREFIX) \
+        .filter(lambda x: not re.findall(SKIP_PATTERNS, x)) \
+        .map(lambda x: x.replace(FB_PREDIX, NEW_PREFIX)) \
         .collect()
 
     # TODO implement save new rdd
