@@ -5,15 +5,15 @@ import utils
 
 # HISTORY_PATH = "hdfs://localhost:9000/user/user33/testset/dataset_test_100k_header.csv"
 FB_PATH = "path/to/FB"
-PREFIX = "http://rdf.freebase.com/ns"
-PREFIX_SUBST = "f://b.co"
+PREFIX = "http://rdf.freebase.com/ns/"
+PREFIX_SUBST = "f:"
 
 
 def is_triple_allowed(line):
     #se passa attraverso tutte le regex ritorna True, altrimenti False
 
-    SKIP_PATTERNS = "w3\.org|"\
-    +"@(?!en)|"\
+    SKIP_PATTERNS = "@(?!en)|"\
+    +"w3\.org|"\
     +"/type\.|"\
     +"/user.*|"\
     +"/freebase\.(?!domain_category).*|"\
@@ -35,8 +35,7 @@ def clean_triple(line):
     return line.replace(PREFIX,PREFIX_SUBST)
 
 def run_job(rdd):
-    rdd = rdd.filter(filter_period).map(clean_triple)
-    rdd.collect()
+    rdd = rdd.filter(is_triple_allowed).map(clean_triple).collect()
     for l in rdd:
         print(l)
 
