@@ -26,13 +26,14 @@ SKIP_PATTERNS = "@(?!en)|"\
 
 
 def run_job(rdd):
-    rdd = rdd
-        .filter(lambda x: not re.findall(SKIP_PATTERNS, x)
-        .map(lambda x: x.replace(FB_PREDIX, NEW_PREFIX)
+    rdd = rdd \
+        .filter(lambda x: not re.findall(SKIP_PATTERNS, x) \
+        .map(lambda x: x.replace(FB_PREDIX, NEW_PREFIX) \
+        .collect()
 
     # TODO implement save new rdd
-    for l in rdd.collect():
-        print(l)  
+    for l in rdd:
+        print(l)
 
 
 if __name__ == "__main__":
