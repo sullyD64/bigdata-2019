@@ -1,14 +1,19 @@
-neo4j:
-  image: neo4j:latest
-  container_name: testneo4j
+neo:
+  image: neo4j:3.5.9
+  container_name: neo
+  volumes:
+  - $HOME/neo/data:/var/lib/neo4j/data
+  - $HOME/neo/logs:/var/lib/neo4j/logs
+  - $HOME/neo/import:/var/lib/neo4j/import
+  - $HOME/neo/plugins:/var/lib/neo4j/plugins
+  - $HOME/neo/conf:/var/lib/neo4j/conf
   environment:
   - NEO4J_AUTH=none
+  - NEO4J_dbms_unmanaged_extension_classes=semantics.extension=/rdf
+  - NEO4J_dbms_memory_heap_initial__size=23g
+  - NEO4J_dbms_memory_heap_max__size=23g
+  - NEO4J_dbms_memory_pagecache_size=27400m
   ports:
+  - "7373:7473"
   - "7474:7474"
   - "7687:7687"
-  volumes:
-  - $HOME/neo4j/data:/data
-  - $HOME/neo4j/logs:/logs
-  - $HOME/neo4j/import:/var/lib/neo4j/import
-  - $HOME/neo4j/plugins:/plugins
-  - $HOME/neo4j/conf:/conf

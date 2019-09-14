@@ -9,6 +9,7 @@ venv
 .settings
 .project
 .classpath
-project1/\.vscode/
+.vscode
+*.zip
 __pycache__
 _SUCCESS
