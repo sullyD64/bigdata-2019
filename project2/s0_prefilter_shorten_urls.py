@@ -5,8 +5,8 @@ import utils
 import shutil
 
 PROT = "file://"
-# INPUT = "/home/freebase/freebase-rdf-latest"
-INPUT = "/home/freebase/fb1m"
+INPUT = "/home/freebase/freebase-rdf-latest"
+# INPUT = "/home/freebase/fb20m"
 OUTPUT = INPUT + "-s0"
 
 NS_PREFIX = "http://rdf.freebase.com/ns/"
@@ -16,26 +16,33 @@ KEY_PREFIX = "http://rdf.freebase.com/key"
 NEW_KEY_PREFIX = "k:"
 
 # TODO refine cleaning strategy
-SKIP_PATTERNS = "@(?!en)|"\
-    + "w3\.org|"\
-    + "/type\.|"\
-    + "/user.*|"\
-    + "/freebase\.(?!domain_category).*|"\
-    + "/usergroup\.|"\
-    + "/permission\.|"\
-    + "/community\.|"\
-    + "/common\.(?!document|topic)\b.*|"\
-    + "/common\.document\.(?!source_uri)\b.*|"\
-    + "/common\.topic\.(description|image|webpage|properties|weblink|notable_for|article).*|"\
-    + "/dataworld\.|"\
-    + "/base\."
-    
+SKIP_PATTERNS = "\"@(?!en)|" \
+    + "\"@en-|" \
+    + "/common\.(?!topic|document|notable_for)|" \
+    + "\t<http:\/\/www\.w3\.org[^>]*>\t(?!\.)|" \
+    + "/base\.|" \
+    + "/freebase\.(?!type_hints)|" \
+    + "/dataworld\.|" \
+    + "/user\.|" \
+    + "/pipeline\.|" \
+    + "/kp_lw\.|" \
+    + "/help\.|" \
+    + "/usergroup\.|" \
+    + "/community\.|" \
+    + "/atom\." \
+
+
+def clean_triple(line):
+    # shorten URL prefixes for /ns/ and /key/ namespaces
+    line = line.replace(NS_PREFIX, NEW_NS_PREFIX).replace(KEY_PREFIX, NEW_KEY_PREFIX)
+    # removes external schema references for literal types (like w3.org's XMLSchema)
+    return re.sub(r"\^\^[^\t]*\t", "", line)
+
 
 def run_job(rdd):
     rdd = rdd \
         .filter(lambda x: not re.findall(SKIP_PATTERNS, x)) \
-        .map(lambda x: x.replace(NS_PREFIX, NEW_NS_PREFIX)
-                        .replace(KEY_PREFIX, NEW_KEY_PREFIX))
+        .map(clean_triple)
 
     rdd.repartition(1).saveAsTextFile(PROT + OUTPUT)
     # for l in rdd.collect():
