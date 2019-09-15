@@ -2,11 +2,15 @@ from pyspark import Row, SparkConf, SparkContext
 from pyspark.sql import SparkSession, SQLContext
 import re
 import utils
+import shutil
 
-# FB_DUMP_PATH = "file:///home/freebase/freebase-rdf-latest"
-FB_DUMP_PATH = "file:///home/freebase/fb100k"
-FB_PREFIX = "http://rdf.freebase.com/ns/"
-NEW_PREFIX = "f:"
+PROT = "file://"
+# INPUT = "/home/freebase/freebase-rdf-latest"
+INPUT = "/home/freebase/fb1m"
+OUTPUT = INPUT + "-s0"
+
+URI_PREFIX = "http://rdf.freebase.com/ns/"
+NEW_URI_PREFIX = "f:"
 
 # TODO refine cleaning strategy
 SKIP_PATTERNS = "@(?!en)|"\
@@ -28,17 +32,21 @@ SKIP_PATTERNS = "@(?!en)|"\
 def run_job(rdd):
     rdd = rdd \
         .filter(lambda x: not re.findall(SKIP_PATTERNS, x)) \
-        .map(lambda x: x.replace(FB_PREFIX, NEW_PREFIX)) \
-        .collect()
+        .map(lambda x: x.replace(URI_PREFIX, NEW_URI_PREFIX))
 
-    # TODO implement save new rdd
-    for l in rdd:
-        print(l)
+    rdd.repartition(1).saveAsTextFile(PROT + OUTPUT)
+    # for l in rdd.collect():
+    #     print(l)
 
 
 if __name__ == "__main__":
-    spark=utils.create_session("FB_filtering")
-    sc=spark.sparkContext
+    spark = utils.create_session("FB_filtering")
+    sc = spark.sparkContext
 
-    fb_rdd=utils.load_data(sc, FB_DUMP_PATH)
+    try:
+        shutil.rmtree(OUTPUT)
+    except:
+        pass
+
+    fb_rdd = utils.load_data(sc, PROT + INPUT)
     run_job(fb_rdd)
