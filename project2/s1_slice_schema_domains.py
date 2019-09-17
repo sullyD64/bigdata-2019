@@ -46,17 +46,17 @@ def run_job(rdd):
 
     # Save RDDs
     smd_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + KEY)
-    key_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + COMMON)
-    common_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + TYPE)
-    type_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + FREEBASE)
-    freebase_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + KG)
-    kg_rdd.repartition(1) \
         .saveAsTextFile(OUTPUT + SMD)
+    key_rdd.repartition(1) \
+        .saveAsTextFile(OUTPUT + KEY)
+    common_rdd.repartition(1) \
+        .saveAsTextFile(OUTPUT + COMMON)
+    type_rdd.repartition(1) \
+        .saveAsTextFile(OUTPUT + TYPE)
+    freebase_rdd.repartition(1) \
+        .saveAsTextFile(OUTPUT + FREEBASE)
+    kg_rdd.repartition(1) \
+        .saveAsTextFile(OUTPUT + KG)
 
     try:
         os.mkdir(OUTPUT)
