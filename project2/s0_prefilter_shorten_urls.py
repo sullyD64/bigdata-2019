@@ -1,8 +1,10 @@
+import re
+import shutil
+
 from pyspark import Row, SparkConf, SparkContext
 from pyspark.sql import SparkSession, SQLContext
-import re
+
 import utils
-import shutil
 
 PROT = "file://"
 INPUT = "/home/freebase/freebase-rdf-latest"
@@ -15,7 +17,6 @@ NEW_NS_PREFIX = "f:"
 KEY_PREFIX = "http://rdf.freebase.com/key"
 NEW_KEY_PREFIX = "k:"
 
-# TODO refine cleaning strategy
 SKIP_PATTERNS = "\"@(?!en)|" \
     + "\"@en-|" \
     + "/common\.(?!topic|document|notable_for)|" \
