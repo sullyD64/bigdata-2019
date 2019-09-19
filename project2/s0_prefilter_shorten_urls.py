@@ -37,7 +37,7 @@ def clean_triple(line):
     # shorten URL prefixes for /ns/ and /key/ namespaces
     line = line.replace(NS_PREFIX, NEW_NS_PREFIX).replace(KEY_PREFIX, NEW_KEY_PREFIX)
     # removes external schema references for literal types (like w3.org's XMLSchema)
-    return re.sub(r"\^\^[^\t]*\t", "", line)
+    return re.sub(r"\^\^[^\t]*", "", line)
 
 
 def run_job(rdd):
