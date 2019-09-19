@@ -13,7 +13,7 @@ PROT = "file://"
 INPUT='/home/freebase/freebase-s1/freebase-s1'
 OUTPUT='/home/freebase/freebase-s2'
 
-SLICE_IDS = ['-smd', '-key', '-common', 'type', '-freebase', '-kg']
+SLICE_IDS = ['-smd', '-key', '-common', '-type', '-freebase', '-kg']
 # SLICE_IDS = ['-smdtest', '-commontest']
 
 TABBED_PATTERN = r'^(([^\t]*\t){2}(<[^>]*>|".*"(@en)?))\.$'

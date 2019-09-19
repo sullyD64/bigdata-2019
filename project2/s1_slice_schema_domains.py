@@ -10,7 +10,7 @@ import utils
 INPUT = '/home/freebase/freebase-s0'
 OUTPUT = '/home/freebase/freebase-s1'
 
-SLICE_IDS = ['-smd', '-key', '-common', 'type', '-freebase', '-kg']
+SLICE_IDS = ['-smd', '-key', '-common', '-type', '-freebase', '-kg']
 
 DOMAIN_PATTERNS = r"\t<(k:|f:(common|type|freebase|kg))[^>]*>\t(?!\.)"
 PATTERN_KEY = r"\t<k:[^>]*>\t(?!\.)"
