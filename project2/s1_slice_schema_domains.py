@@ -7,18 +7,10 @@ from pyspark.sql import SparkSession, SQLContext
 
 import utils
 
-PROT = "file://"
-HOME = "/home/freebase/"
+INPUT = '/home/freebase/freebase-s0'
+OUTPUT = '/home/freebase/freebase-s1'
 
-INPUT = HOME + "freebase-s0"
-OUTPUT = INPUT[:-2] + "s1"
-
-KEY = "-key"
-COMMON = "-common"
-TYPE = "-type"
-FREEBASE = "-freebase"
-KG = "-kg"
-SMD = "-smd"
+SLICE_IDS = ['-smd', '-key', '-common', 'type', '-freebase', '-kg']
 
 DOMAIN_PATTERNS = r"\t<(k:|f:(common|type|freebase|kg))[^>]*>\t(?!\.)"
 PATTERN_KEY = r"\t<k:[^>]*>\t(?!\.)"
@@ -45,50 +37,33 @@ def run_job(rdd):
     kg_rdd = schema_rdd.filter(lambda x: re.findall(PATTERN_KG, x))
 
     # Save RDDs
-    smd_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + SMD)
-    key_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + KEY)
-    common_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + COMMON)
-    type_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + TYPE)
-    freebase_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + FREEBASE)
-    kg_rdd.repartition(1) \
-        .saveAsTextFile(OUTPUT + KG)
+    smd_rdd.repartition(1).saveAsTextFile(OUTPUT + SLICE_IDS[0])
+    key_rdd.repartition(1).saveAsTextFile(OUTPUT + SLICE_IDS[1])
+    common_rdd.repartition(1).saveAsTextFile(OUTPUT + SLICE_IDS[2])
+    type_rdd.repartition(1).saveAsTextFile(OUTPUT + SLICE_IDS[3])
+    freebase_rdd.repartition(1).saveAsTextFile(OUTPUT + SLICE_IDS[4])
+    kg_rdd.repartition(1).saveAsTextFile(OUTPUT + SLICE_IDS[5])
 
-    try:
-        os.mkdir(OUTPUT)
-    except:
-        shutil.rmtree(OUTPUT)
-        os.mkdir(OUTPUT)
-    shutil.move(OUTPUT + KEY + "/part-00000", OUTPUT + '/freebase-s1' + KEY)
-    shutil.move(OUTPUT + COMMON + "/part-00000", OUTPUT + '/freebase-s1' + COMMON)
-    shutil.move(OUTPUT + TYPE + "/part-00000", OUTPUT + '/freebase-s1' + TYPE)
-    shutil.move(OUTPUT + FREEBASE + "/part-00000", OUTPUT + '/freebase-s1' + FREEBASE)
-    shutil.move(OUTPUT + KG + "/part-00000", OUTPUT + '/freebase-s1' + KG)
-    shutil.move(OUTPUT + SMD + "/part-00000", OUTPUT + '/freebase-s1' + SMD)
 
 if __name__ == "__main__":
-    spark = utils.create_session("FB_filtering")
+    spark = utils.create_session("FB_slicing")
     sc = spark.sparkContext
 
     try:
-        # shutil.rmtreee(OUTPUT)
-        shutil.rmtree(OUTPUT + KEY)
-        shutil.rmtree(OUTPUT + COMMON)
-        shutil.rmtree(OUTPUT + TYPE)
-        shutil.rmtree(OUTPUT + FREEBASE)
-        shutil.rmtree(OUTPUT + KG)
-        shutil.rmtree(OUTPUT + SMD)
+        shutil.rmtree(OUTPUT)
     except:
-        pass
+        os.mkdir(OUTPUT)
 
-    fb_rdd = utils.load_data(sc, PROT + INPUT)
+    for slice_id in SLICE_IDS:
+        try:
+            shutil.rmtree(OUTPUT + slice_id)
+        except:
+            pass  
 
-    # test on 1 million
-    # test_rdd = sc.parallelize(fb_rdd.take(1000000))
-    # run_job(test_rdd)
-
+    fb_rdd = utils.load_data(sc, 'file://' + INPUT)
     run_job(fb_rdd)
+
+    for slice_id in SLICE_IDS:
+        shutil.move(OUTPUT + slice_id + "/part-00000", OUTPUT + '/freebase-s1' + slice_id)
+
+
