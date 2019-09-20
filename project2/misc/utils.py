@@ -30,8 +30,9 @@ def ontology_exists():
 def generate_ontology(subject, pred, prefix):
 	#dalla tripla genera le triple relative al dominio e al tipo in riferimento al soggetto
 	pred_split = pred.split(".")
-	domain_line = subject+"\t<"+prefix+"has_domain>\t"+pred_split[0]
-	type_line = subject+"\t<"+prefix+"instance_of>\t"+pred_split[1]
+	domain_line = pred_split[1]+"\t<"+prefix+"has_domain>\t"+pred_split[0]
+	type_line = subject+"\t<"+prefix+"has_type>\t"+pred_split[1]
+	property_line = pred_split[1]+"\t<"+prefix+"has_property>\t"+pred_split[2]
 
 	return [domain_line, type_line]
 
