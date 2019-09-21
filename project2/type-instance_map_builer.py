@@ -43,7 +43,8 @@ def delete_graphs():
     print(f"Deleting graphs...")
     tti.close()
     tot.close()
-    shutil.rmtree(ROOTDIR + 'tti_graph')
+    # we keep tti as it resembles the type-instance-map, to not recreate it later.
+    # shutil.rmtree(ROOTDIR + 'tti_graph')
     shutil.rmtree(ROOTDIR + 'tot_graph')
     print("Done.")
 
@@ -73,4 +74,6 @@ if __name__ == "__main__":
     print(f"Sorting {OUT}...")
     os.system(f"sort {OUT} -o {OUT}")
 
+    # we only delete TOT
     delete_graphs()
+
