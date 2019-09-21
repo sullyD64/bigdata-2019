@@ -5,7 +5,7 @@ import sys
 
 from pyspark import Row, SparkConf, SparkContext
 from pyspark.sql import SparkSession, SQLContext
-from rdflib.plugins.parsers.ntriples import *
+from rdflib.plugins.parsers.ntriples import NTriplesParser
 
 import utils
 

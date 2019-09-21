@@ -1,3 +1,4 @@
+import os
 import re
 import shutil
 
@@ -7,24 +8,41 @@ from pyspark.sql import SparkSession, SQLContext
 import utils
 
 PROT = "file://"
-INPUT = "/home/freebase/fbsmd2"
-# INPUT = "/home/freebase/fb20m"
-OUTPUT = INPUT + "-s3"
+INPUT = '/home/freebase/freebase-s2/freebase-s2'
+OUTPUT = '/home/freebase/freebase-s3'
+
+SLICE_IDS = ['-smd', '-type']
 
 SKIP_PATTERNS = "\t<http:[^>]*>\t\."
 
 
+def run_job(rdd, slice_id):
 
-def run_job(rdd):
-    rdd = rdd.filter(lambda x: not re.findall(SKIP_PATTERNS, x))
-    rdd.repartition(1).saveAsTextFile(PROT + OUTPUT)
-    # for l in rdd.collect():
-    #     print(l)
+    rdd.filter(lambda x: not re.findall(SKIP_PATTERNS, x)) \
+        .repartition(1) \
+        .saveAsTextFile(OUTPUT + slice_id)
 
 
 if __name__ == "__main__":
-    spark = utils.create_session("FB_filtering")
+    spark = utils.create_session("FB_filtering_https")
     sc = spark.sparkContext
-    
-    fb_rdd = utils.load_data(sc, PROT + INPUT)
-    run_job(fb_rdd)
+
+    try:
+        shutil.rmtree(OUTPUT)
+    except:
+        os.mkdir(OUTPUT)
+
+    for slice_id in SLICE_IDS:
+        try:
+            shutil.rmtree(OUTPUT + slice_id)
+        except:
+            pass
+
+  # Run the job for each slice produced in s2
+    for slice_id in SLICE_IDS:
+        rdd = utils.load_data(sc, PROT + INPUT + slice_id)
+        run_job(rdd, slice_id)
+
+    for slice_id in SLICE_IDS:
+        shutil.move(OUTPUT + slice_id + "/part-00000",
+                    OUTPUT + '/freebase-s3' + slice_id)
