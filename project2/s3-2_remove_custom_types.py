@@ -29,12 +29,20 @@ def extract_subject(row):
     return (fields[0], fields[1:])
 
 
+def reformat_string(row):
+    out = [row[0]]
+    for token in row[1]:
+        out.append(token)
+    return('\t'.join(out))
+
+
 def run_job(rdd):
     rdd = rdd \
         .map(extract_subject) \
         .groupByKey() \
         .filter(is_custom_type_def) \
         .flatMapValues(lambda x: x) \
+        .map(reformat_string) \
         .repartition(1) \
         .saveAsTextFile(TMP)
 
