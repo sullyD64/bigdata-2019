@@ -2,9 +2,6 @@ import os
 import re
 import shutil
 
-from pyspark import Row, SparkConf, SparkContext
-from pyspark.sql import SparkSession, SQLContext
-
 import utils
 
 PROT = "file://"
@@ -16,17 +13,17 @@ OUTPUT = ROOT + 'freebase-s32-type'
 CUSTOM_TYPES = ['\"/base/', '\"/user/']
 
 
+def extract_subject(row):
+    fields = row.split("\t")
+    return (fields[0], fields[1:])
+
+
 def is_custom_type_def(row):
     if (row[0].startswith(("<f:m.", "<f:g."))):
         for subject_object_dot in iter(row[1]):
             if subject_object_dot[1].startswith(tuple(CUSTOM_TYPES)):
                 return False
-        return True
-
-
-def extract_subject(row):
-    fields = row.split("\t")
-    return (fields[0], fields[1:])
+    return True
 
 
 def reformat_string(row):
@@ -59,5 +56,10 @@ if __name__ == "__main__":
     rdd = utils.load_data(sc, PROT + INPUT)
     run_job(rdd)
 
-    shutil.move(TMP + "/part-00000", OUTPUT)
+    try:
+        os.remove(OUTPUT)
+        shutil.move(TMP + "/part-00000", OUTPUT)
+    except:
+        pass
+
     shutil.rmtree(TMP)
