@@ -1,14 +1,19 @@
 import os
 import shutil
-from rdflib import Graph, Namespace, URIRef
+from rdflib import Graph, URIRef
+
+'''
+WARNING: THIS IS A SLOW SCRIPT (not a Spark job!)
+'''
 
 ROOTDIR = '/home/freebase/freebase-s4/'
+# TTI and TOT are slices of freebase-s3-type, extracted using UNIX grep:
+# TTI contains all triples with Predicate type.type.instance (30,9% of total triples)
+# TOT contains all triples with Predicate type.object.type (6,2% of total triples)
 TTI = 'fbtype__type-type-instance'
 TOT = 'fbtype__type-object-type'
-# TTI = 'ttitest'
-# TOT = 'tottest'
 
-OUT = 'type_instance_map'
+OUT = 'tti_reference'
 CUSTOM_PREDICATE = 'fbo:type'
 
 tti = Graph(store='Sleepycat', identifier='type-instance-map')
@@ -43,7 +48,7 @@ def delete_graphs():
     print(f"Deleting graphs...")
     tti.close()
     tot.close()
-    # we keep tti as it resembles the type-instance-map, to not recreate it later.
+    # we keep tti as it offers a reference for building the type-instance-map.
     # shutil.rmtree(ROOTDIR + 'tti_graph')
     shutil.rmtree(ROOTDIR + 'tot_graph')
     print("Done.")
