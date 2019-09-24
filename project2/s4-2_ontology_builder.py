@@ -203,8 +203,11 @@ if __name__ == "__main__":
                 if (URI(FB+obj), None, None) not in TIM:
                     # eagerly look for object's type in TTI if it's not a literal, so that we are sure that it will have a type
                     # (otherwise if the mid is not subject in any triple, it will be orphan of a type)
-                    obj_type = list(TTI.triples((None, None, (URI(FB+obj)))))[0][0][2:]
-                    add_objtype = (URI(FB+obj), FBO.type, URI(FBO+obj_type))
+                    try:
+                        obj_type = list(TTI.triples((None, None, (URI(FB+obj)))))[0][0][2:]
+                        add_objtype = (URI(FB+obj), FBO.type, URI(FBO+obj_type))
+                    except:
+                        pass
 
             # ADD TRIPLES TO TIM
             initial_length = len(TIM)
