@@ -104,10 +104,12 @@ if __name__ == "__main__":
         # MAIN LOOP
         logger.info("==== BEGIN LOOP OVER SMD")
         for i, triple in enumerate(infile):
-            logger.info(f"Processing triple #{i+1}")
             tokens = triple.split("\t")
             subj, pred, obj = tokens[0], tokens[1], tokens[2]
             pred = pred[3:-1].split(".")
+
+            if len(pred) < 3:
+                continue
 
             fdomain = f"/{pred[0]}"
             ftype = f"/{pred[0]}/{pred[1]}"
@@ -192,7 +194,6 @@ if __name__ == "__main__":
             ONTO.add(add_tlabel)
             ONTO.add(add_plabel)
             delta = len(ONTO) - initial_length
-            logger.info(f"[ONTO] - {delta} triples added.")
 
             # type-instance-mapping for subject and object
             # we user our custom predicate, FBO:type, to establish a link between ontology and instances.
@@ -215,7 +216,7 @@ if __name__ == "__main__":
             if add_objtype:
                 TIM.add(add_objtype)
             delta = len(TIM) - initial_length
-            logger.info(f"[TIM] - {delta} triples added.")
+            logger.info(f"#{i+1} | [ONTO] - {delta} triples added. | [TIM] - {delta} triples added.")
         logger.info("==== LOOP OVER SMD COMPLETED")
     
     # for s, p, o in ONTO:
