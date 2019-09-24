@@ -9,7 +9,7 @@ INPUT = '<PATH DATASET INPUT>'
 # INPUT = '<PATH DATASET INPUT TEST (più piccolo)'>
 # TMPDIR = PATH DOVE SALVARE L'RDD AS TEXT FILE (GENERA UNA DIRECTORY)
 TMPDIR = '<PATH STESSO NOME OUTPUT + "-tmp">'
-OUTPUT = '<PATH DATASET OUTPUT FINALE'
+OUTPUT = '<PATH DATASET OUTPUT FINALE>'
 
 def run_job(rdd):
     # rdd = rdd \
@@ -17,7 +17,7 @@ def run_job(rdd):
     #     .saveAsSequenceFile(TMPDIR)
 
 if __name__ == "__main__":
-    spark = utils.create_session("<NOME_SESSIONE>")
+    spark = utils.create_session("<FB_JOB-ID>")
     sc = spark.sparkContext
 
     # rimuovo l'output del precedente job (genera errore se il file è protetto da scrittura,

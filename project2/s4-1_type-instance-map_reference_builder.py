@@ -1,19 +1,24 @@
 import os
 import shutil
+
 from rdflib import Graph, URIRef
 
 '''
+TODO Implement S4 enrichment extractor & TIM builders, then DEPRECATE
+'''
+
+'''
 WARNING: THIS IS A SLOW SCRIPT (not a Spark job!)
+TTI and TOT are slices of freebase-s3-type, extracted using UNIX grep:
+-   TTI contains all triples with Predicate type.type.instance (30,9% of total triples)
+-   TOT contains all triples with Predicate type.object.type (6,2% of total triples)
 '''
 
 ROOTDIR = '/home/freebase/freebase-s4/'
-# TTI and TOT are slices of freebase-s3-type, extracted using UNIX grep:
-# TTI contains all triples with Predicate type.type.instance (30,9% of total triples)
-# TOT contains all triples with Predicate type.object.type (6,2% of total triples)
 TTI = 'fbtype__type-type-instance'
 TOT = 'fbtype__type-object-type'
+OUTPUT = 'tti_reference'
 
-OUT = 'tti_reference'
 CUSTOM_PREDICATE = 'fbo:type'
 
 tti = Graph(store='Sleepycat', identifier='type-instance-map')
@@ -67,16 +72,16 @@ if __name__ == "__main__":
           0 else "TOT *IS* a subset of TTI!")
 
     # save the resulting graph to output file
-    if os.path.exists(OUT):
-        os.remove(OUT)
+    if os.path.exists(OUTPUT):
+        os.remove(OUTPUT)
 
-    print(f"Saving output to: {OUT}...")
-    output = open(ROOTDIR + OUT, 'w')
+    print(f"Saving output to: {OUTPUT}...")
+    output = open(ROOTDIR + OUTPUT, 'w')
     for s, p, o in tti:
         output.write(f"<{o}>\t<{CUSTOM_PREDICATE}>\t<{s}>\t.\n")
     output.close()
-    print(f"Sorting {OUT}...")
-    os.system(f"sort {OUT} -o {OUT}")
+    print(f"Sorting {OUTPUT}...")
+    os.system(f"sort {OUTPUT} -o {OUTPUT}")
 
     # we only delete TOT
     delete_graphs()

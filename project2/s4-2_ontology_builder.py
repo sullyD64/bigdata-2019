@@ -1,10 +1,12 @@
-import os
-import sys
-import logging
-import shutil
 import json
+import logging
+import os
 import re
-from rdflib import Graph, URIRef as URI, Literal, Namespace, RDF, RDFS, OWL
+import shutil
+import sys
+
+from rdflib import OWL, RDF, RDFS, Graph, Literal, Namespace
+from rdflib import URIRef as URI
 
 file_handler = logging.FileHandler(filename='ontology-builder.log')
 stdout_handler = logging.StreamHandler(sys.stdout)
@@ -19,8 +21,8 @@ logger = logging.getLogger()
 
 ROOTDIR = '/home/freebase/freebase-s4/'
 SMD_path = '/home/freebase/freebase-s3/freebase-s3-smd'
-ODTP_path = '/home/freebase/freebase-s3/odtp-dict.json'
-# ODTP_path = '/home/freebase/freebase-s3/odtptest.json'
+ODTP_path = ROOTDIR + '/odtp-dict.json'
+# ODTP_path = ROOTDIR + '/odtptest.json'
 
 TTI = Graph(store='Sleepycat', identifier='type-instance-map')
 ONTO = Graph(store='Sleepycat', identifier='ontology')

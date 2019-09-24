@@ -1,15 +1,18 @@
+import json
 import os
 import re
 import shutil
-import json
 
 import utils
 
+'''
+TODO Implement S4 enrichment extractor & TIM builders, then DEPRECATE
+'''
+
 PROT = "file://"
-ROOTDIR = '/home/freebase/freebase-s3/'
-INPUT = ROOTDIR + 'freebase-s32-type'
-# INPUT = ROOTDIR + 't100'
-TMP = ROOTDIR + 'odtp-dict-out'
+ROOTDIR = '/home/freebase/freebase-s4/'
+INPUT = '/home/freebase/freebase-s3/freebase-s3-type'
+TMPDIR = ROOTDIR + 'odtp-dict-out'
 OUTPUT = ROOTDIR + 'odtp-dict'
 
 
@@ -50,10 +53,10 @@ def run_job(rdd, sc):
         .groupByKey() \
         .mapValues(iterate) \
         .repartition(1) \
-        .saveAsSequenceFile(TMP)
+        .saveAsSequenceFile(TMPDIR)
 
-    shutil.move(TMP + "/part-00000", OUTPUT + '-tmp')
-    shutil.rmtree(TMP)
+    shutil.move(TMPDIR + "/part-00000", OUTPUT + '-tmp')
+    shutil.rmtree(TMPDIR)
 
     with open(OUTPUT + '.json', 'w') as output:
         temp = sc.sequenceFile(OUTPUT+'-tmp').collectAsMap()
@@ -71,7 +74,7 @@ if __name__ == "__main__":
         pass
 
     try:
-        shutil.rmtree(TMP)
+        shutil.rmtree(TMPDIR)
     except:
         pass
 
