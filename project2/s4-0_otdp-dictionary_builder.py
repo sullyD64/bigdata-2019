@@ -8,6 +8,7 @@ import utils
 PROT = "file://"
 ROOT = '/home/freebase/freebase-s3/'
 INPUT = ROOT + 'freebase-s32-type'
+# INPUT = ROOT + 't100'
 TMP = ROOT + 'odtp-dict-out'
 OUTPUT = ROOT + 'odtp-dict'
 
@@ -16,15 +17,17 @@ OUTPUT = ROOT + 'odtp-dict'
 # Among these, we ignore the following Predicates: type.object.type, type.type.type.instance
 PATTERNS = r'^[^\t]+\t<f:type\.' \
     + r'(' \
-        + r'object\.type>\t<f:type\.(domain|type|property)>\t\.$|' \
-        + r'object(?!\.type)|' \
-        + r'domain|' \
-        + r'type\.(?!instance)|' \
-        + r'property' \
+    + r'object\.type>\t<f:type\.(domain|type|property)>\t\.$|' \
+    + r'object(?!\.type)|' \
+    + r'domain|' \
+    + r'type\.(?!instance)|' \
+    + r'property' \
     + r')'
-    
+
+
 def filter_odtp(row):
     return re.findall(PATTERNS, row)
+
 
 def extract_subject(row):
     fields = row.split("\t")
@@ -33,46 +36,44 @@ def extract_subject(row):
     return (fields[0], fields[1:3])
 
 
-def to_dict(rdd):
+def iterate(iterable_list_of_predicates_objects):
     result = {}
-    for item in rdd.items():
-        key, values = item[0], list(item[1])
-        vals = {}
-        for v in list(values):
-            vals.update({v[0]: v[1]})
-        result.update({key: vals})
+    for pred_obj in list(iterable_list_of_predicates_objects):
+        result.update({pred_obj[0]: pred_obj[1]})
     return result
 
-#TODO out of memory 
-def run_job(rdd):
+
+def run_job(rdd, sc):
     rdd = rdd \
         .filter(filter_odtp) \
         .map(extract_subject) \
         .groupByKey() \
+        .mapValues(iterate) \
         .repartition(1) \
-        .saveAsSequenceFile(OUTPUT)
-        # .collectAsMap()
+        .saveAsSequenceFile(TMP)
 
-    # with open(OUTPUT, 'w') as output:
-    #     json.dump(to_dict(rdd), output)
+    shutil.move(TMP + "/part-00000", OUTPUT + '-tmp')
+    shutil.rmtree(TMP)
+
+    with open(OUTPUT + '.json', 'w') as output:
+        temp = sc.sequenceFile(OUTPUT+'-tmp').collectAsMap()
+        json.dump(temp, output)
+        os.remove(OUTPUT + '-tmp')
 
 
 if __name__ == "__main__":
     spark = utils.create_session("FB_dictionary_builder")
     sc = spark.sparkContext
-    
+
+    try:
+        shutil.rmtree(OUTPUT + '.json')
+    except:
+        pass
+
     try:
         shutil.rmtree(TMP)
     except:
         pass
 
     rdd = utils.load_data(sc, PROT + INPUT)
-    run_job(rdd)
-
-    try:
-        os.remove(OUTPUT)
-        shutil.move(TMP + "/part-00000", OUTPUT)
-    except:
-        pass
-
-    shutil.rmtree(TMP)
+    run_job(rdd, sc)

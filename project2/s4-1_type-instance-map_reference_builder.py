@@ -67,7 +67,6 @@ if __name__ == "__main__":
           0 else "TOT *IS* a subset of TTI!")
 
     # save the resulting graph to output file
-    print(f"Saving results to: {OUT}...")
     if os.path.exists(OUT):
         os.remove(OUT)
 
