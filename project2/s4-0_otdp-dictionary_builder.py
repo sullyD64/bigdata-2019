@@ -6,11 +6,11 @@ import json
 import utils
 
 PROT = "file://"
-ROOT = '/home/freebase/freebase-s3/'
-INPUT = ROOT + 'freebase-s32-type'
-# INPUT = ROOT + 't100'
-TMP = ROOT + 'odtp-dict-out'
-OUTPUT = ROOT + 'odtp-dict'
+ROOTDIR = '/home/freebase/freebase-s3/'
+INPUT = ROOTDIR + 'freebase-s32-type'
+# INPUT = ROOTDIR + 't100'
+TMP = ROOTDIR + 'odtp-dict-out'
+OUTPUT = ROOTDIR + 'odtp-dict'
 
 
 # We select only the rows with Predicates of types type.object, type.domain, type.type and type.property.
