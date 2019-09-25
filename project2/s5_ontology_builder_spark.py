@@ -11,6 +11,9 @@ import utils
 NEW ONTOLOGY BUILDER
 This builder uses Spark RDDs instead of rdflib graphs.
 
+Input: freebase-s3-smd
+Output: s5-ontology
+
 For every triple in SMD:
 -   create N ontology triples and store them in a list [o1,o2,...,oN] where oi = (s,p,o).
         (we generate a O(9) triples, so O(1) triples)
@@ -89,7 +92,7 @@ def run_job(rdd):
         .distinct() \
         .repartition(1) \
         .saveAsTextFile(TMPDIR)
-        
+
 
 if __name__ == "__main__":
     spark = utils.create_session("FB_S5_ONTOLOGY")

@@ -19,9 +19,12 @@ INPUT_DATA = ROOTDIR + 's5-ontology'
 # INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
 INPUT_EXT = '/home/freebase/freebase-s3/typetest'
 TMPDIR = ROOTDIR + 'e2-rdfs_range-tmp'
-# CACHED_DATA_TMP = ROOTDIR + 'asdasd'  # no caching for this job
-# CACHED_DATA = ROOTDIR + 'asdasd'
 OUTPUT = ROOTDIR + 'e2-rdfs_range'
+
+# override this to enable caching Data
+USE_CACHE = False
+CACHED_DATA_TMP = ROOTDIR + '__cached-ontology-tmp'
+CACHED_DATA = ROOTDIR + '__cached-ontology'
 
 LOOKUP_PRED = 'type.property.expected_type'
 OUTPUT_PRED = RDFS.range
@@ -43,21 +46,19 @@ if __name__ == "__main__":
     if os.path.exists(TMPDIR):
         shutil.rmtree(TMPDIR)
 
-    # cached = True if os.path.exists(CACHED_DATA) else False
-    # if cached:
-    #     data_rdd = utils.load_data(sc, PROT + CACHED_DATA)
-    # else:
-        
-    data_rdd = utils.load_data(sc, PROT + INPUT_DATA)
+    if USE_CACHE and os.path.exists(CACHED_DATA):
+        data_rdd = utils.load_data(sc, PROT + CACHED_DATA)
+    else:
+        data_rdd = utils.load_data(sc, PROT + INPUT_DATA)
+
     ext_rdd = utils.load_data(sc, PROT + INPUT_EXT)
+    results = extractor.run(data_rdd, ext_rdd, LOOKUP_PRED, OUTPUT_PRED, USE_CACHE, False, IS_PROPERTY, EXT_KEY_MAPPING)  # caching and distinct false
 
-    results = extractor.run(data_rdd, ext_rdd, LOOKUP_PRED, OUTPUT_PRED, False, True, IS_PROPERTY, EXT_KEY_MAPPING)  # caching and distinct false,
-
-    # if not cached:
-    #     data_tocache = results[0]
-    #     data_tocache.repartition(1).saveAsTextFile(CACHED_DATA_TMP)
-    #     shutil.move(f"{CACHED_DATA_TMP}/part-00000", CACHED_DATA)
-    #     shutil.rmtree(CACHED_DATA_TMP)
+    if USE_CACHE:
+        data_tocache = results[0]
+        data_tocache.repartition(1).saveAsTextFile(CACHED_DATA_TMP)
+        shutil.move(f"{CACHED_DATA_TMP}/part-00000", CACHED_DATA)
+        shutil.rmtree(CACHED_DATA_TMP)
 
     out = results[1]
     out.repartition(1).saveAsTextFile(TMPDIR)

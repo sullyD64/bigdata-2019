@@ -13,14 +13,17 @@ Output: e1-fbo_name (triples for adding NAMES to entities in SMD, obtained by sc
 PROT = 'file://'
 ROOTDIR = '/home/freebase/freebase-s5/'
 # TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
-INPUT_DATA = '/home/freebase/freebase-s3/freebase-s30-smd__old'
-INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
-# INPUT_DATA = '/home/freebase/freebase-s3/smdtest'
-# INPUT_EXT = '/home/freebase/freebase-s3/typetest'
+# INPUT_DATA = '/home/freebase/freebase-s3/freebase-s30-smd__old'
+# INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
+INPUT_DATA = '/home/freebase/freebase-s3/smdtest'
+INPUT_EXT = '/home/freebase/freebase-s3/typetest'
 TMPDIR = ROOTDIR + 'e1-fbo_name-tmp'
-CACHED_DATA_TMP = ROOTDIR + 'smd-mids-tmp'
-CACHED_DATA = ROOTDIR + 'smd-mids'
 OUTPUT = ROOTDIR + 'e1-fbo_name'
+
+# override this to enable caching Data
+USE_CACHE = True
+CACHED_DATA_TMP = ROOTDIR + '__cached-smd-mids-tmp'
+CACHED_DATA = ROOTDIR + '__cached-smd-mids'
 
 LOOKUP_PRED = 'type.object.name'
 OUTPUT_PRED = 'fbo:name'
@@ -36,16 +39,15 @@ if __name__ == "__main__":
     if os.path.exists(TMPDIR):
         shutil.rmtree(TMPDIR)
 
-    cached = True if os.path.exists(CACHED_DATA) else False
-    if cached:
+    if USE_CACHE and os.path.exists(CACHED_DATA):
         data_rdd = utils.load_data(sc, PROT + CACHED_DATA)
     else:
         data_rdd = utils.load_data(sc, PROT + INPUT_DATA)
+    
     ext_rdd = utils.load_data(sc, PROT + INPUT_EXT)
+    results = extractor.run(data_rdd, ext_rdd, LOOKUP_PRED, OUTPUT_PRED, USE_CACHE, True, None, None)  # distinct true, no given filtering regex or key mapping
 
-    results = extractor.run(data_rdd, ext_rdd, LOOKUP_PRED, OUTPUT_PRED, cached, True, None, None)  # distinct true, no given filtering regex or key mapping
-
-    if not cached:
+    if USE_CACHE:
         data_tocache = results[0]
         data_tocache.repartition(1).saveAsTextFile(CACHED_DATA_TMP)
         shutil.move(f"{CACHED_DATA_TMP}/part-00000", CACHED_DATA)
