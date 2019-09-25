@@ -12,7 +12,7 @@ Output: e1-fbo_name (triples for adding NAMES to entities in SMD, obtained by sc
 
 PROT = 'file://'
 ROOTDIR = '/home/freebase/freebase-s5/'
-# change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
+# TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
 INPUT_DATA = '/home/freebase/freebase-s3/freebase-s30-smd__old'
 INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
 # INPUT_DATA = '/home/freebase/freebase-s3/smdtest'
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         data_rdd = utils.load_data(sc, PROT + INPUT_DATA)
     ext_rdd = utils.load_data(sc, PROT + INPUT_EXT)
 
-    results = extractor.run(data_rdd, ext_rdd, LOOKUP_PRED, OUTPUT_PRED, cached, True, None)  # distinct true, no filtering function
+    results = extractor.run(data_rdd, ext_rdd, LOOKUP_PRED, OUTPUT_PRED, cached, True, None, None)  # distinct true, no given filtering regex or key mapping
 
     if not cached:
         data_tocache = results[0]

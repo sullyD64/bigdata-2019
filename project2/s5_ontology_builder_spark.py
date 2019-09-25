@@ -2,9 +2,10 @@ import os
 import re
 import shutil
 
-import utils
 from rdflib import OWL, RDF, RDFS, Literal, Namespace
 from rdflib import URIRef as URI
+
+import utils
 
 '''
 NEW ONTOLOGY BUILDER
@@ -25,7 +26,7 @@ ROOTDIR = '/home/freebase/freebase-s5/'
 # TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
 # INPUT = '/home/freebase/freebase-s3/freebase-s3-smd__old'
 INPUT = '/home/freebase/freebase-s3/smdtest'
-TMPDIR = ROOTDIR + 's5-ontology-tmp' 
+TMPDIR = ROOTDIR + 's5-ontology-tmp'
 OUTPUT = ROOTDIR + 's5-ontology'
 
 FB = Namespace('f:')
@@ -38,7 +39,7 @@ def generate_ontology(row):
     onto = []
     pred = pred[3:-1].split(".")
 
-    if len(pred) == 3: 
+    if len(pred) == 3:
         fdomain = f"/{pred[0]}"
         ftype = f"/{pred[0]}/{pred[1]}"
         fprop = f"/{pred[0]}/{pred[1]}/{pred[2]}"
@@ -75,6 +76,7 @@ def format_string(row):
     else:
         return f"<{row[0]}>\t<{row[1]}>\t<{row[2]}>\t."
 
+
 def run_job(rdd):
     rdd = rdd \
         .map(generate_ontology) \
@@ -84,6 +86,7 @@ def run_job(rdd):
         .map(format_string) \
         .repartition(1) \
         .saveAsTextFile(TMPDIR)
+
 
 if __name__ == "__main__":
     spark = utils.create_session("FB_S5_ONTOLOGY")

@@ -32,7 +32,7 @@ def reformat_string(row, output_pred):
 
 
 '''
-PARAMETERS:(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_filtering_function=None)
+PARAMETERS:(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_filtering_regex=None)
     --> step 1.1: map Data in una coppia (<subject>, None)
     --> step 1.2: filter Data (opzionale, tolgo le chiavi che non mi interessano, <d/t> e <d> nel caso di expected_type)
     --> step 1.3: distinct di Data (opzionale)
@@ -49,12 +49,11 @@ PARAMETERS:(data, ext, lookup_pred, output_pred, cached=False, distinct=False, k
     --> step 5: return rdd (non salvarlo qui come file, lo salvo da fuori.)
 
 '''
-def run(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_filtering_func=None):
-    
+def run(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_filtering_regex=None, ext_key_mapping=None):
     data = data.map(lambda row: (row.split('\t')[0], None))
     if not cached:
-        if key_filtering_func:
-            data = data.filter(key_filtering_func)
+        if key_filtering_regex:
+            data = data.filter(lambda row: re.findall(key_filtering_regex, row[0]))
         if distinct:
             data = data.distinct()
 
@@ -63,6 +62,9 @@ def run(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_f
         .filter(lambda row: is_predicate(row[1][0], lookup_pred)) \
         .map(lambda row: (row[0], row[1][1])) \
         .distinct()
+
+    if (ext_key_mapping):
+        ext = ext.map(lambda row: (re.sub(ext_key_mapping['pattern'], ext_key_mapping['replace'], row[0]), row[1]))
 
     result = data.leftOuterJoin(ext) \
         .filter(lambda row: row[1][1] is not None) \
