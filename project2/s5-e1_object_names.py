@@ -15,6 +15,8 @@ ROOTDIR = '/home/freebase/freebase-s5/'
 # change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
 INPUT_DATA = '/home/freebase/freebase-s3/freebase-s30-smd__old'
 INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
+# INPUT_DATA = '/home/freebase/freebase-s3/smdtest'
+# INPUT_EXT = '/home/freebase/freebase-s3/typetest'
 TMPDIR = ROOTDIR + 'e1-fbo_name-tmp'
 CACHED_DATA_TMP = ROOTDIR + 'smd-mids-tmp'
 CACHED_DATA = ROOTDIR + 'smd-mids'

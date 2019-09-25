@@ -17,17 +17,18 @@ Output: an Enrichment, which is an N-Triples file with the triples to be added t
 # Map s,p,o RDF triples to (s,[p,o]) key-value pairs
 def extract_subject(row):
     fields = row.split("\t")
+    # fields[2] = re.sub(r'\"', '\"', fields[2])
     return (fields[0], fields[1:-1])  # ignore trailing dot (last field)
 
 
 # Compare the predicate with the given one
 def is_predicate(row_pred, lookup_pred):
-    return row_pred[3][3:-1] == lookup_pred
+    return row_pred[3:-1] == lookup_pred
 
 
 # Reform the tab-separated string, adding output_pred as predicate of the triple
 def reformat_string(row, output_pred):
-    return f"{row[0]}\t<{output_pred}>\t{row[1]}\t." # add the dot back
+    return f"{row[0]}\t<{output_pred}>\t{row[1][1]}\t." # add the dot back
 
 
 '''
@@ -40,14 +41,18 @@ PARAMETERS:(data, ext, lookup_pred, output_pred, cached=False, distinct=False, k
     --> step 2: filter_by_regex di Ext (estraggo le triple cercando il predicato lookup_pred)
     --> step 3: map Ext filtrato in una coppia (<subject>, <object>)
 
-    --> step 3: Data.join(Ext)
-        (<d/t/p>, (None, <object>))
-    --> step 4: map (scarto le coppie dal join estraendo il valore pescato da Ext, riformatto la tripla includendo l'output_pred passato.
+    --> step 3: Data.leftOuterJoin(Ext)
+        (<d/t/p>, (None, <object>)) oppure (<d/t/p>, (None, None))
+    --> step 4.1: filter (scarto le righe senza valore proveniente da destra, ovvero il secondo campo del valore è None)
+    --> step 4.2: map (estraggo le coppie dal join estraendo il valore pescato da Ext, riformatto la tripla includendo l'output_pred passato.
+    --> step 4.3: map su Data: estraggo i mid per rendere più semplice il salvataggio dei suoi valori
     --> step 5: return rdd (non salvarlo qui come file, lo salvo da fuori.)
+
 '''
 def run(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_filtering_func=None):
+    
+    data = data.map(lambda row: (row.split('\t')[0], None))
     if not cached:
-        data = data.map(lambda row: (row.split('\t')[0], None))
         if key_filtering_func:
             data = data.filter(key_filtering_func)
         if distinct:
@@ -57,8 +62,15 @@ def run(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_f
         .map(extract_subject) \
         .filter(lambda row: is_predicate(row[1][0], lookup_pred)) \
         .map(lambda row: (row[0], row[1][1])) \
+        .distinct()
 
-    result = data.join(ext).map(reformat_string)
+    result = data.leftOuterJoin(ext) \
+        .filter(lambda row: row[1][1] is not None) \
+        .map(lambda row: reformat_string(row, output_pred))
+
+    # Extract mids from Data to return it in a writable format
+    data = data.map(lambda row: row[0])
+
     return ([data, result])
 
 if __name__ == "__main__":

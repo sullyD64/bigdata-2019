@@ -36,7 +36,7 @@ def is_custom_type_def(row):
     return True
 
 
-# Reform the tab-separated string.
+# Reform the tab-separated string
 def reformat_string(row):
     out = [row[0]]
     for token in row[1]:

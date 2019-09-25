@@ -6,7 +6,7 @@ import shutil
 import utils
 
 '''
-TODO Implement S4 enrichment extractor & TIM builders, then DEPRECATE
+TODO Implement S4 enrichment extractor & ONTO/TIM builders, then DEPRECATE
 '''
 
 PROT = "file://"
