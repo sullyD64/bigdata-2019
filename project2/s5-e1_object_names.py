@@ -13,17 +13,17 @@ Output: e1-fbo_name (triples for adding NAMES to entities in SMD, obtained by sc
 PROT = 'file://'
 ROOTDIR = '/home/freebase/freebase-s5/'
 # TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
-# INPUT_DATA = '/home/freebase/freebase-s3/freebase-s30-smd__old'
-# INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
-INPUT_DATA = '/home/freebase/freebase-s3/smdtest'
-INPUT_EXT = '/home/freebase/freebase-s3/typetest'
+INPUT_DATA = '/home/freebase/freebase-s3/freebase-s30-smd__old'
+INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
+# INPUT_DATA = '/home/freebase/freebase-s3/smdtest'
+# INPUT_EXT = '/home/freebase/freebase-s3/typetest'
 TMPDIR = ROOTDIR + 'e1-fbo_name-tmp'
 OUTPUT = ROOTDIR + 'e1-fbo_name'
 
 # override this to enable caching Data
 USE_CACHE = True
-CACHED_DATA_TMP = ROOTDIR + '__cached-smd-mids-tmp'
-CACHED_DATA = ROOTDIR + '__cached-smd-mids'
+CACHED_DATA_TMP = ROOTDIR + 'cached-smd-mids-tmp'
+CACHED_DATA = ROOTDIR + 'cached-smd-mids'
 
 LOOKUP_PRED = 'type.object.name'
 OUTPUT_PRED = 'fbo:name'

@@ -25,8 +25,8 @@ For every triple in SMD:
 PROT = 'file://'
 ROOTDIR = '/home/freebase/freebase-s5/'
 # TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
-# INPUT = '/home/freebase/freebase-s3/freebase-s3-smd__old'
-INPUT = '/home/freebase/freebase-s3/smdtest'
+INPUT = '/home/freebase/freebase-s3/freebase-s3-smd__old'
+# INPUT = '/home/freebase/freebase-s3/smdtest'
 TMPDIR = ROOTDIR + 's5-ontology-tmp'
 OUTPUT = ROOTDIR + 's5-ontology'
 
@@ -76,7 +76,6 @@ def generate_ontology(row):
         # onto.append(format_triple(URI(FBO+uprop), RDFS.label, Literal(fprop))
 
         # ALTERNATIVE (instead of using 3-level structure, use just the leaf, first letter capitalized and with  _ = whitespace
-        # TODO discuss
         def pretty_label(leaf):
             return re.sub('_', ' ', f"{leaf[0].upper()}{leaf[1:]}")
         onto.append(format_triple(URI(FBO+udomain), RDFS.label, Literal(pretty_label(pred[0]))))

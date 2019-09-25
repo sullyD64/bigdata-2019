@@ -27,10 +27,10 @@ This job is subdivided in the following steps:
 PROT = 'file://'
 ROOTDIR = '/home/freebase/freebase-s5/'
 # TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
-# INPUT = '/home/freebase/freebase-s3/freebase-s3-smd__old'
-INPUT = '/home/freebase/freebase-s3/smdtest'
-# TTI = '/home/freebase/freebase-s4/tti_reference'
-TTI = '/home/freebase/freebase-s4/ttitest'
+INPUT_SMD = '/home/freebase/freebase-s3/freebase-s3-smd__old'
+INPUT_TTI = '/home/freebase/freebase-s4/tti_reference'
+# INPUT_SMD = '/home/freebase/freebase-s3/smdtest'
+# INPUT_TTI = '/home/freebase/freebase-s4/ttitest'
 TMPDIR = ROOTDIR + 's5-tim-tmp'
 OUTPUT = ROOTDIR + 's5-tim'
 
@@ -107,7 +107,7 @@ def run_job(smd, tti):
         .filter(lambda x: not x[1][0] and not x[1][1]) \
         .map(lambda x: (x[0], None))
 
-    # step 3: look for types of anonymous pitsin TTI
+    # step 3: look for types of anonymous pits in TTI
     tti = tti \
         .filter(is_instance_of_a_type) \
         .map(extract_tti_type) \
@@ -131,8 +131,8 @@ if __name__ == "__main__":
     if os.path.exists(TMPDIR):
         shutil.rmtree(TMPDIR)
 
-    smd_rdd = utils.load_data(sc, PROT + INPUT)
-    tti_rdd = utils.load_data(sc, PROT + TTI)
+    smd_rdd = utils.load_data(sc, PROT + INPUT_SMD)
+    tti_rdd = utils.load_data(sc, PROT + INPUT_TTI)
     run_job(smd_rdd, tti_rdd)
 
     shutil.move(f"{TMPDIR}/part-00000", OUTPUT)

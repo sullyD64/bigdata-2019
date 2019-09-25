@@ -16,15 +16,15 @@ Output: e2-rdfs_range (triples to add RANGE to Properties in the ontology, obtai
 PROT = 'file://'
 ROOTDIR = '/home/freebase/freebase-s5/'
 INPUT_DATA = ROOTDIR + 's5-ontology'
-# INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
-INPUT_EXT = '/home/freebase/freebase-s3/typetest'
+INPUT_EXT = '/home/freebase/freebase-s3/freebase-s3-type'
+# INPUT_EXT = '/home/freebase/freebase-s3/typetest'
 TMPDIR = ROOTDIR + 'e2-rdfs_range-tmp'
 OUTPUT = ROOTDIR + 'e2-rdfs_range'
 
 # override this to enable caching Data
 USE_CACHE = False
-CACHED_DATA_TMP = ROOTDIR + '__cached-ontology-tmp'
-CACHED_DATA = ROOTDIR + '__cached-ontology'
+CACHED_DATA_TMP = ROOTDIR + 'cached-ontology-tmp'
+CACHED_DATA = ROOTDIR + 'cached-ontology'
 
 LOOKUP_PRED = 'type.property.expected_type'
 OUTPUT_PRED = RDFS.range

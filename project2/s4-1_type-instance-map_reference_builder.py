@@ -4,7 +4,7 @@ import shutil
 from rdflib import Graph, URIRef
 
 '''
-TODO Implement S4 enrichment extractor & ONTO/TIM builders, then DEPRECATE
+DEPRECATED. Use s5 instead.
 '''
 
 '''
