@@ -14,10 +14,8 @@ This builder uses Spark RDDs instead of rdflib graphs.
 For every triple in SMD:
 -   create N ontology triples and store them in a list [o1,o2,...,oN] where oi = (s,p,o).
         (we generate a O(9) triples, so O(1) triples)
--   map the triple (<subject>, [o1,o2,...,oN])
--   flatMap each row: each row is (<subject>, oi)
--   replace the key with the value
--   distinct the keys (this way we eliminate all the duplicates)
+-   flatMap each row: each row is (oi)
+-   distinct rows (this way we eliminate all the duplicates)
 -   save all the triples
 '''
 
@@ -31,6 +29,13 @@ OUTPUT = ROOTDIR + 's5-ontology'
 
 FB = Namespace('f:')
 FBO = Namespace('fbo:')
+
+
+def format_triple(s,p,o):
+    if isinstance(o, Literal):
+        return f"<{s}>\t<{p}>\t\"{o}\"\t."
+    else:
+        return f"<{s}>\t<{p}>\t<{o}>\t."
 
 
 def generate_ontology(row):
@@ -49,53 +54,42 @@ def generate_ontology(row):
         uprop = f"{pred[0]}.{pred[1]}.{pred[2]}"
 
         # domain
-        onto.append((URI(FBO+udomain), RDF.type, RDFS.Class))
+        onto.append(format_triple(URI(FBO+udomain), RDF.type, RDFS.Class))
         # type (type is subclass of domain)
-        onto.append((URI(FBO+utype), RDF.type, RDFS.Class))
-        onto.append((URI(FBO+utype), RDFS.subClassOf, URI(FBO+udomain)))
+        onto.append(format_triple(URI(FBO+utype), RDF.type, RDFS.Class))
+        onto.append(format_triple(URI(FBO+utype), RDFS.subClassOf, URI(FBO+udomain)))
 
         # property (either a relationship or a literal property)
         if (obj.startswith('<')):
-            onto.append((URI(FBO+uprop), RDF.type, OWL.ObjectProperty))
+            onto.append(format_triple(URI(FBO+uprop), RDF.type, OWL.ObjectProperty))
         else:
-            onto.append((URI(FBO+uprop), RDF.type, OWL.DatatypeProperty))
+            onto.append(format_triple(URI(FBO+uprop), RDF.type, OWL.DatatypeProperty))
         # property domain
-        onto.append((URI(FBO+uprop), RDFS.domain, URI(FBO+utype)))
+        onto.append(format_triple(URI(FBO+uprop), RDFS.domain, URI(FBO+utype)))
 
         # labels (to improve readability)
-        # onto.append((URI(FBO+udomain), RDFS.label, Literal(fdomain)))
-        # onto.append((URI(FBO+utype), RDFS.label, Literal(ftype)))
-        # onto.append((URI(FBO+uprop), RDFS.label, Literal(fprop)))
+        # onto.append(format_triple(URI(FBO+udomain), RDFS.label, Literal(fdomain))
+        # onto.append(format_triple(URI(FBO+utype), RDFS.label, Literal(ftype))
+        # onto.append(format_triple(URI(FBO+uprop), RDFS.label, Literal(fprop))
 
         # ALTERNATIVE (instead of using 3-level structure, use just the leaf, first letter capitalized and with  _ = whitespace
         # TODO discuss
         def pretty_label(leaf):
             return re.sub('_', ' ', f"{leaf[0].upper()}{leaf[1:]}")
-        onto.append((URI(FBO+udomain), RDFS.label, Literal(pretty_label(pred[0]))))
-        onto.append((URI(FBO+utype), RDFS.label, Literal(pretty_label(pred[1]))))
-        onto.append((URI(FBO+uprop), RDFS.label, Literal(pretty_label(pred[2]))))
-
-    return (subj, onto)
-
-
-def format_string(row):
-    s, p, o = row[0], row[1], row[2]
-    if isinstance(o, Literal):
-        return f"<{s}>\t<{p}>\t\"{o}\"\t."
-    else:
-        return f"<{row[0]}>\t<{row[1]}>\t<{row[2]}>\t."
+        onto.append(format_triple(URI(FBO+udomain), RDFS.label, Literal(pretty_label(pred[0]))))
+        onto.append(format_triple(URI(FBO+utype), RDFS.label, Literal(pretty_label(pred[1]))))
+        onto.append(format_triple(URI(FBO+uprop), RDFS.label, Literal(pretty_label(pred[2]))))  
+    return onto
 
 
 def run_job(rdd):
     rdd = rdd \
         .map(generate_ontology) \
-        .flatMapValues(lambda x: x) \
-        .map(lambda row: row[1]) \
+        .flatMap(lambda x: x) \
         .distinct() \
-        .map(format_string) \
         .repartition(1) \
         .saveAsTextFile(TMPDIR)
-
+        
 
 if __name__ == "__main__":
     spark = utils.create_session("FB_S5_ONTOLOGY")
