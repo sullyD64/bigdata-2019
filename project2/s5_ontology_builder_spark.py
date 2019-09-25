@@ -63,9 +63,18 @@ def generate_ontology(row):
         onto.append((URI(FBO+uprop), RDFS.domain, URI(FBO+utype)))
 
         # labels (to improve readability)
-        onto.append((URI(FBO+udomain), RDFS.label, Literal(fdomain)))
-        onto.append((URI(FBO+utype), RDFS.label, Literal(ftype)))
-        onto.append((URI(FBO+uprop), RDFS.label, Literal(fprop)))
+        # onto.append((URI(FBO+udomain), RDFS.label, Literal(fdomain)))
+        # onto.append((URI(FBO+utype), RDFS.label, Literal(ftype)))
+        # onto.append((URI(FBO+uprop), RDFS.label, Literal(fprop)))
+
+        # ALTERNATIVE (instead of using 3-level structure, use just the leaf, first letter capitalized and with  _ = whitespace
+        # TODO discuss
+        def pretty_label(leaf):
+            return re.sub('_', ' ', f"{leaf[0].upper()}{leaf[1:]}")
+        onto.append((URI(FBO+udomain), RDFS.label, Literal(pretty_label(pred[0]))))
+        onto.append((URI(FBO+utype), RDFS.label, Literal(pretty_label(pred[1]))))
+        onto.append((URI(FBO+uprop), RDFS.label, Literal(pretty_label(pred[2]))))
+
     return (subj, onto)
 
 
