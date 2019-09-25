@@ -10,7 +10,18 @@ import utils
 '''
 NEW TYPE-INSTANCE-MAP BUILDER
 This builder uses Spark RDDs instead of rdflib graphs.
-TODO implement new TIM builder, need TTI too
+
+Input: freebase-s3-smd, tti_reference
+Output: s5-tim
+
+This job is subdivided in the following steps:
+1) type inference from SMD
+2) finding anonymous pits 
+    (a node is a pit if there are no outgoing arcs)
+    (a node is anonymous if there are no literal properties describing it)
+    (a mid is an anonymous pit if it never appears on the subject of any triple in SMD)
+3) anonymous pit type lookup in TTI
+4) join the anonymous pit for which a type has been found with the types inferenced from SMD.
 '''
 
 PROT = 'file://'
@@ -18,6 +29,8 @@ ROOTDIR = '/home/freebase/freebase-s5/'
 # TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
 # INPUT = '/home/freebase/freebase-s3/freebase-s3-smd__old'
 INPUT = '/home/freebase/freebase-s3/smdtest'
+# TTI = '/home/freebase/freebase-s4/tti_reference'
+TTI = '/home/freebase/freebase-s4/ttitest'
 TMPDIR = ROOTDIR + 's5-tim-tmp'
 OUTPUT = ROOTDIR + 's5-tim'
 
@@ -25,40 +38,88 @@ FB = Namespace('f:')
 FBO = Namespace('fbo:')
 
 
-def generate_ontology(row):
+# Some triples have invalid predicates!
+def is_valid_predicate(row):
+    return len(row.split("\t")[1][3:-1].split(".")) == 3
+
+
+def extract_left(row):
     tokens = row.split("\t")
-    subj, pred, obj = tokens[0], tokens[1], tokens[2]
-    onto = []
-    pred = pred[3:-1].split(".")
-
-    if len(pred) == 3:
-        utype = f"{pred[0]}.{pred[1]}"
-        # rdf:type is for assigning labels to the instance nodes
-        add_subjtype = (URI(FB+subj[3:-1]), RDF.type, URI(FBO+utype))
-        # fbo:type is for establishing actual links with the onthology nodes
-        add_subjtype = (URI(FB+subj[3:-1]), FBO.type, URI(FBO+utype))
-
-    return (subj, onto)
+    subj, pred = tokens[0], tokens[1]
+    dt = pred[3:-1].split(".")
+    return (subj, f"{dt[0]}.{dt[1]}")
 
 
-def format_string(row):
-    s, p, o = row[0], row[1], row[2]
-    if isinstance(o, Literal):
-        return f"<{s}>\t<{p}>\t\"{o}\"\t."
-    else:
-        return f"<{row[0]}>\t<{row[1]}>\t<{row[2]}>\t."
+def is_relation(row):
+    return row.split("\t")[2].startswith('<')
 
 
-def run_job(rdd):
-    # rdd = rdd \
-    #     .map(generate_ontology) \
-    #     .flatMapValues(lambda x: x) \
-    #     .map(lambda row: row[1]) \
-    #     .distinct() \
-    #     .map(format_string) \
-    #     .repartition(1) \
-    #     .saveAsTextFile(TMPDIR)
+def extract_right(row):
+    tokens = row.split("\t")
+    obj = tokens[2]
+    return (obj, None)
 
+
+def is_instance_of_a_type(row):
+    return len(row.split("\t")[2][3:-1].split('.')) == 2
+
+
+def extract_tti_type(row):
+    tokens = row.split("\t")
+    subj, dt = tokens[0], tokens[2][3:-1]
+    return (subj, dt)
+
+
+def generate_triples(row):
+    subj = row[0]
+    dt = ''
+    if (row[1][0] and not row[1][1]):
+        dt = row[1][0]
+    elif (row[1][1] and not row[1][0]):
+        dt = row[1][1]
+    
+    def format_triple(s, p, o):
+        return f"<{s}>\t<{p}>\t<{o}>\t."
+
+    # rdf:type is for assigning labels to the instance nodes
+    # fbo:type is for establishing actual links with the onthology nodes
+    rdftype = format_triple(URI(FB+subj[3:-1]), RDF.type, URI(FBO+dt))
+    fbotype = format_triple(URI(FB+subj[3:-1]), FBO.type, URI(FBO+dt))
+
+    return [rdftype, fbotype]
+
+
+def run_job(smd, tti):
+    # step 0 (some triples might not be valid)
+    smd = smd.filter(is_valid_predicate)
+
+    # step 1: type-instance inference from SMD
+    sleft = smd \
+        .map(extract_left) \
+        .distinct()
+
+    # step 2: finding anonymous pits
+    sright = smd \
+        .filter(is_relation) \
+        .map(extract_right) \
+        .distinct()
+    an_pits = sleft.fullOuterJoin(sright) \
+        .filter(lambda x: not x[1][0] and not x[1][1]) \
+        .map(lambda x: (x[0], None))
+
+    # step 3: look for types of anonymous pitsin TTI
+    tti = tti \
+        .filter(is_instance_of_a_type) \
+        .map(extract_tti_type) \
+        .distinct()
+    an_pits_populated = tti.rightOuterJoin(an_pits) \
+        .map(lambda x: (x[0],x[1][0]))
+
+    # step 4: add the "resolved" anonymous pits types to the inferenced types
+    result = sleft.fullOuterJoin(an_pits_populated) \
+        .flatMap(generate_triples) \
+        .repartition(1) \
+        .saveAsTextFile(TMPDIR)
 
 if __name__ == "__main__":
     spark = utils.create_session("FB_S5_ONTOLOGY")
@@ -70,8 +131,9 @@ if __name__ == "__main__":
     if os.path.exists(TMPDIR):
         shutil.rmtree(TMPDIR)
 
-    fb_rdd = utils.load_data(sc, PROT + INPUT)
-    run_job(fb_rdd)
+    smd_rdd = utils.load_data(sc, PROT + INPUT)
+    tti_rdd = utils.load_data(sc, PROT + TTI)
+    run_job(smd_rdd, tti_rdd)
 
     shutil.move(f"{TMPDIR}/part-00000", OUTPUT)
     shutil.rmtree(TMPDIR)
