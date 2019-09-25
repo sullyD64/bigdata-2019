@@ -8,6 +8,11 @@ import sys
 from rdflib import OWL, RDF, RDFS, Graph, Literal, Namespace
 from rdflib import URIRef as URI
 
+'''
+WARNING: THIS IS A REALLY SLOW SCRIPT (not a Spark job!)
+Runtime on SMD is undefined, might be weeks or even months.
+'''
+
 file_handler = logging.FileHandler(filename='ontology-builder.log')
 stdout_handler = logging.StreamHandler(sys.stdout)
 handlers = [file_handler, stdout_handler]

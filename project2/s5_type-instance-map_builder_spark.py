@@ -11,7 +11,7 @@ import utils
 NEW TYPE-INSTANCE-MAP BUILDER
 This builder uses Spark RDDs instead of rdflib graphs.
 
-Input: freebase-s3-smd, tti_reference
+Input: freebase-s3-smd, tim_reference
 Output: s5-tim
 
 This job is subdivided in the following steps:
@@ -20,7 +20,7 @@ This job is subdivided in the following steps:
     (a node is a pit if there are no outgoing arcs)
     (a node is anonymous if there are no literal properties describing it)
     (a mid is an anonymous pit if it never appears on the subject of any triple in SMD)
-3) anonymous pit type lookup in TTI
+3) anonymous pit type lookup in TIM
 4) join the anonymous pit for which a type has been found with the types inferenced from SMD.
 '''
 
@@ -28,9 +28,9 @@ PROT = 'file://'
 ROOTDIR = '/home/freebase/freebase-s5/'
 # TODO change this when s0, s1 and s2 are run again. for now, we keep the "old" s32 dump
 INPUT_SMD = '/home/freebase/freebase-s3/freebase-s3-smd__old'
-INPUT_TTI = '/home/freebase/freebase-s4/tti_reference'
+INPUT_TIM = '/home/freebase/freebase-s4/tim_reference'
 # INPUT_SMD = '/home/freebase/freebase-s3/smdtest'
-# INPUT_TTI = '/home/freebase/freebase-s4/ttitest'
+# INPUT_TIM = '/home/freebase/freebase-s4/timtest'
 TMPDIR = ROOTDIR + 's5-tim-tmp'
 OUTPUT = ROOTDIR + 's5-tim'
 
@@ -64,7 +64,7 @@ def is_instance_of_a_type(row):
     return len(row.split("\t")[2][3:-1].split('.')) == 2
 
 
-def extract_tti_type(row):
+def extract_tim_type(row):
     tokens = row.split("\t")
     subj, dt = tokens[0], tokens[2][3:-1]
     return (subj, dt)
@@ -89,7 +89,7 @@ def generate_triples(row):
     return [rdftype, fbotype]
 
 
-def run_job(smd, tti):
+def run_job(smd, tim):
     # step 0 (some triples might not be valid)
     smd = smd.filter(is_valid_predicate)
 
@@ -107,12 +107,12 @@ def run_job(smd, tti):
         .filter(lambda x: not x[1][0] and not x[1][1]) \
         .map(lambda x: (x[0], None))
 
-    # step 3: look for types of anonymous pits in TTI
-    tti = tti \
+    # step 3: look for types of anonymous pits in TIM
+    tim = tim \
         .filter(is_instance_of_a_type) \
-        .map(extract_tti_type) \
+        .map(extract_tim_type) \
         .distinct()
-    an_pits_populated = tti.rightOuterJoin(an_pits) \
+    an_pits_populated = tim.rightOuterJoin(an_pits) \
         .map(lambda x: (x[0],x[1][0]))
 
     # step 4: add the "resolved" anonymous pits types to the inferenced types
@@ -132,8 +132,8 @@ if __name__ == "__main__":
         shutil.rmtree(TMPDIR)
 
     smd_rdd = utils.load_data(sc, PROT + INPUT_SMD)
-    tti_rdd = utils.load_data(sc, PROT + INPUT_TTI)
-    run_job(smd_rdd, tti_rdd)
+    tim_rdd = utils.load_data(sc, PROT + INPUT_TIM)
+    run_job(smd_rdd, tim_rdd)
 
     shutil.move(f"{TMPDIR}/part-00000", OUTPUT)
     shutil.rmtree(TMPDIR)

@@ -4,7 +4,7 @@ import shutil
 from rdflib import Graph, URIRef
 
 '''
-DEPRECATED. Use s5 instead.
+DEPRECATED. Use s4_tim_reference_extractor instead.
 '''
 
 '''
@@ -17,7 +17,7 @@ TTI and TOT are slices of freebase-s3-type, extracted using UNIX grep:
 ROOTDIR = '/home/freebase/freebase-s4/'
 TTI = 'fbtype__type-type-instance'
 TOT = 'fbtype__type-object-type'
-OUTPUT = 'tti_reference'
+OUTPUT = 'tim_reference'
 
 CUSTOM_PREDICATE = 'fbo:type'
 
