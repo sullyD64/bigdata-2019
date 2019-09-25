@@ -32,7 +32,6 @@ def reformat_string(row, output_pred):
 
 
 '''
-PARAMETERS:(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_filtering_regex=None)
     --> step 1.1: map Data in una coppia (<subject>, None)
     --> step 1.2: filter Data (opzionale, tolgo le chiavi che non mi interessano, <d/t> e <d> nel caso di expected_type)
     --> step 1.3: distinct di Data (opzionale)
@@ -47,7 +46,6 @@ PARAMETERS:(data, ext, lookup_pred, output_pred, cached=False, distinct=False, k
     --> step 4.2: map (estraggo le coppie dal join estraendo il valore pescato da Ext, riformatto la tripla includendo l'output_pred passato.
     --> step 4.3: map su Data: estraggo i mid per rendere più semplice il salvataggio dei suoi valori
     --> step 5: return rdd (non salvarlo qui come file, lo salvo da fuori.)
-
 '''
 def run(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_filtering_regex=None, ext_key_mapping=None):
     data = data.map(lambda row: (row.split('\t')[0], None))
@@ -68,7 +66,8 @@ def run(data, ext, lookup_pred, output_pred, cached=False, distinct=False, key_f
 
     result = data.leftOuterJoin(ext) \
         .filter(lambda row: row[1][1] is not None) \
-        .map(lambda row: reformat_string(row, output_pred))
+        .map(lambda row: reformat_string(row, output_pred)) \
+        .distinct()
 
     # Extract mids from Data to return it in a writable format
     data = data.map(lambda row: row[0])
