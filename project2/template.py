@@ -15,6 +15,7 @@ def run_job(rdd):
     # rdd = rdd \
     # OPERAZIONI SU RDD
     #     .saveAsSequenceFile(TMPDIR)
+    pass
 
 if __name__ == "__main__":
     spark = utils.create_session("<FB_JOB-ID>")
